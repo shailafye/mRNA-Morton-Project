@@ -6,3 +6,4 @@ print(type(newick))
 
 print(newick['children'])
 
+print
