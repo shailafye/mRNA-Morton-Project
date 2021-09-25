@@ -8,7 +8,10 @@ def open_seq(file_name):
         gene_name = lines[line].strip()[1:]
         gene_sequences[gene_name] = lines[line+1].strip()
 
-    print(gene_sequences)
+    return gene_sequences
 
-open_seq('./ancestralseqs.fasta.nodes.txt')
-open_seq('./grass_rbcl.txt')
+ancestral = open_seq('./ancestralseqs.fasta.nodes.txt')
+rbcl = open_seq('./grass_rbcl.txt')
+
+ancestral.update(rbcl)
+print(ancestral.keys())
