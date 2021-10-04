@@ -76,7 +76,10 @@ class TreeTracer:
                     else:
                         print('not in dictionary with sequences')
             #print('====')
-        self.sum_matrix_dict = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts)))
+        try:
+            self.sum_matrix_dict = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts)))
+        except:
+            pass
         return True
 
     def individual_matrix_conversion(self) -> np.array:
@@ -109,7 +112,7 @@ class TreeTracer:
 tree_obj = TreeTracer('iqtree_newick.txt', 'grass_rbcl_nodes_seq_fasta.txt')
 tree_obj.trace_tree_function(n1_context)
 print(tree_obj.final_matrix_dict)
-tree_obj.cumulative_matrix_conversion()
+#tree_obj.cumulative_matrix_conversion()
 #tree_obj.matrix_conversion()
 # print(tree_obj.seq_dict.keys())
 # tree_obj.draw_tree('normal')
