@@ -9,7 +9,6 @@ from tree_functions import n0_context, n1_context
 import collections, functools, operator
 
 
-
 class TreeTracer:
     """
     newick_file = 'iqtree_newick.txt'
@@ -59,11 +58,11 @@ class TreeTracer:
         # iterate through all nodes
         list_dicts = []
         for clade in self.tree.find_clades():
-            #print('Clade:', clade)
+            # print('Clade:', clade)
             if len(clade.clades) > 0:
-                #print('children:', clade.clades)
+                # print('children:', clade.clades)
                 for child in clade.clades:
-                    #print('child: ', child)
+                    # print('child: ', child)
                     # add if statement to check if in dictionary
                     if str(clade) in self.seq_dict and str(child) in self.seq_dict:
                         # print('pair:',clade, ' and ',child)
@@ -75,7 +74,7 @@ class TreeTracer:
                         list_dicts.append(function_called(seq1, seq2))
                     else:
                         print('not in dictionary with sequences')
-            #print('====')
+            # print('====')
         try:
             self.sum_matrix_dict = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts)))
         except:
@@ -93,7 +92,7 @@ class TreeTracer:
                 i = k[0]
                 j = k[1]
                 matrix_arr[conversion[i]][conversion[j]] = int(val)
-            print(key, '\n',matrix_arr)
+            print(key, '\n', matrix_arr)
         return True
 
     def cumulative_matrix_conversion(self):
@@ -109,12 +108,44 @@ class TreeTracer:
         print(matrix_arr)
         return True
 
+
 tree_obj = TreeTracer('iqtree_newick.txt', 'grass_rbcl_nodes_seq_fasta.txt')
 tree_obj.trace_tree_function(n1_context)
-print(tree_obj.final_matrix_dict)
-#tree_obj.cumulative_matrix_conversion()
-#tree_obj.matrix_conversion()
+#print('break')
+#print(tree_obj.final_matrix_dict)
+first = tree_obj.final_matrix_dict['Node1, Lilium']
+second = tree_obj.final_matrix_dict['Node1, Node2']
+#print(first['A_A'])
+#print(second['A_A'])
+#print('updated')
+from mergedeep import merge
+#new_dict = {**first, **second}
+#new_dict= dict(first, **second)
+#new_dict = first | second
+list_dicts = []
+list_dicts.append(first['A_A'])
+list_dicts.append(second['A_A'])
+new_dict = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts)))
+#print(new_dict)
+# print(tree_obj.sum_matrix_dict)
+# tree_obj.cumulative_matrix_conversion()
+# tree_obj.matrix_conversion()
 # print(tree_obj.seq_dict.keys())
 # tree_obj.draw_tree('normal')
 # tree_obj.draw_tree('ascii')
 # tree_obj.print_tree()
+
+# function to merge dictionaries
+# merge all dictionaries and one to merge specific ones
+#print(tree_obj.final_matrix_dict)
+print("------")
+all_vals = list(tree_obj.final_matrix_dict.values())
+print(all_vals)
+def merge_all_n1(dictionary):
+    """
+    :param dictionary: a dictionary of dictionaries of dictionaries keys being
+    :return: a dictionary that is summed of all the other dictionaries
+    """
+    pass
+
+

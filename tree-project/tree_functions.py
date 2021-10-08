@@ -60,7 +60,7 @@ def n1_context(seq1, seq2):
             neighboring_nuc_dict[neighbor_key][nuc_change_key] += 1
     return neighboring_nuc_dict
 
-print(n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACACGCTCAATGTACAGATTTACCA'))
+#print(n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACACGCTCAATGTACAGATTTACCA'))
 """
 ATGCAGACGCTCAATGTGCAGATATACCA
 ATGCAcACGCTCAATGTaCAGATtTACCA
@@ -75,3 +75,11 @@ def n2_context(seq1, seq2):
 
 
     """
+
+
+
+AT__C
+AT__C
+
+gTCGACAtAGAGt --> CA_AG
+ATCGACAcAGAGA
