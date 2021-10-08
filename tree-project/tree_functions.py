@@ -77,9 +77,3 @@ def n2_context(seq1, seq2):
     """
 
 
-
-AT__C
-AT__C
-
-gTCGACAtAGAGt --> CA_AG
-ATCGACAcAGAGA
