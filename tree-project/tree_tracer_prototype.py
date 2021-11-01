@@ -5,7 +5,7 @@ A class that creates this tree dictionary and then functions can be called.
 import itertools
 import numpy as np
 from Bio import Phylo
-from tree_functions import n0_context, n1_context
+from tree_functions import n0_context, n1_context, globdict
 import collections, functools, operator
 
 
@@ -54,15 +54,15 @@ class TreeTracer:
         print(self.tree)
         return
 
-    def trace_tree_function(self, function_called):
+    def trace_tree_function(self, function_called, branch_length = True):
         # iterate through all nodes
         list_dicts = []
         for clade in self.tree.find_clades():
-            # print('Clade:', clade)
+            #print('Clade:', clade)
             if len(clade.clades) > 0:
-                # print('children:', clade.clades)
+                #print('children:', clade.clades)
                 for child in clade.clades:
-                    # print('child: ', child)
+                    #print('child: ', child.branch_length)
                     # add if statement to check if in dictionary
                     if str(clade) in self.seq_dict and str(child) in self.seq_dict:
                         # print('pair:',clade, ' and ',child)
@@ -71,7 +71,10 @@ class TreeTracer:
                         seq2 = self.seq_dict[child.name]
                         key = str(clade.name + ', ' + child.name)
                         self.final_matrix_dict[key] = function_called(seq1, seq2)
-                        list_dicts.append(function_called(seq1, seq2))
+                        if branch_length:
+                            list_dicts.append(function_called(seq1, seq2, increment=child.branch_length))
+                        else:
+                            list_dicts.append(function_called(seq1, seq2, increment=1))
                     else:
                         print('not in dictionary with sequences')
             # print('====')
@@ -109,43 +112,37 @@ class TreeTracer:
         return True
 
 
-tree_obj = TreeTracer('iqtree_newick.txt', 'grass_rbcl_nodes_seq_fasta.txt')
-tree_obj.trace_tree_function(n1_context)
-#print('break')
-#print(tree_obj.final_matrix_dict)
-first = tree_obj.final_matrix_dict['Node1, Lilium']
-second = tree_obj.final_matrix_dict['Node1, Node2']
-#print(first['A_A'])
-#print(second['A_A'])
-#print('updated')
-from mergedeep import merge
-#new_dict = {**first, **second}
-#new_dict= dict(first, **second)
-#new_dict = first | second
-list_dicts = []
-list_dicts.append(first['A_A'])
-list_dicts.append(second['A_A'])
-new_dict = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts)))
-#print(new_dict)
-# print(tree_obj.sum_matrix_dict)
-# tree_obj.cumulative_matrix_conversion()
-# tree_obj.matrix_conversion()
-# print(tree_obj.seq_dict.keys())
-# tree_obj.draw_tree('normal')
-# tree_obj.draw_tree('ascii')
-# tree_obj.print_tree()
+class Matrix:
+    def __init__(self, total_matrix_dict, sep_matrix_dict, sum_matrix_dict):
+        self.total_matrix_dict = total_matrix_dict
+        self.sep_matrix_dict = sep_matrix_dict
+        self.comb_matrix_dict = sum_matrix_dict
 
-# function to merge dictionaries
-# merge all dictionaries and one to merge specific ones
+    def n1_matrix(self):
+        for key in self.total_matrix_dict:
+            arr_zero = np.full((4, 4), 0, dtype=int)
+            matrix_dict = self.total_matrix_dict[key]
+            matrix_arr = arr_zero
+            conversion = {'A': 0, 'T': 1, 'G': 2, 'C': 3}
+            for k in matrix_dict:
+                val = matrix_dict[k]
+                i = k[0]
+                j = k[1]
+                matrix_arr[conversion[i]][conversion[j]] = float(val)
+            print(key, '\n', matrix_arr)
+        return True
+
+
+tree_obj = TreeTracer('iqtree_newick.txt', 'grass_rbcl_nodes_seq_fasta.txt')
+tree_obj.trace_tree_function(n1_context, branch_length=False)
+sep_matrix_dict = tree_obj.final_matrix_dict
+sum_matrix_dict = tree_obj.sum_matrix_dict
 #print(tree_obj.final_matrix_dict)
-print("------")
-all_vals = list(tree_obj.final_matrix_dict.values())
-print(all_vals)
-def merge_all_n1(dictionary):
-    """
-    :param dictionary: a dictionary of dictionaries of dictionaries keys being
-    :return: a dictionary that is summed of all the other dictionaries
-    """
-    pass
+#print(tree_obj.sum_matrix_dict)
+#print('global',globdict)
+tree_matrix = Matrix(globdict, sep_matrix_dict, sum_matrix_dict)
+tree_matrix.n1_matrix()
+
+
 
 

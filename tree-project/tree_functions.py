@@ -11,14 +11,17 @@ def n0_context(seq1, seq2):
         change_dict[key] = 0
     for i in range(min(len(seq1), len(seq2))):
         if seq1[i] == seq2[i]:
-            continue
+            nuc_change = str(seq1[i]) + str(seq2[i])
+            change_dict[nuc_change] += 1
         elif seq1[i] != seq2[i]:
             nuc_change = str(seq1[i]) + str(seq2[i])
             change_dict[nuc_change] += 1
     return change_dict
 
-
-def n1_context(seq1, seq2):
+globdict = {}
+def n1_context(seq1, seq2,increment=1.0):
+    global globdict
+    increment = float(increment)
     """
     A_A, A_T, A_G, A_C,
     T_A, T_T, T_G, T_C,
@@ -57,10 +60,19 @@ def n1_context(seq1, seq2):
                     key = str(k[0] + k[1])
                     change_dict[key] = 0
                 neighboring_nuc_dict[neighbor_key] = change_dict
-            neighboring_nuc_dict[neighbor_key][nuc_change_key] += 1
+                if neighbor_key not in globdict:
+                    globdict[neighbor_key] = change_dict
+            neighboring_nuc_dict[neighbor_key][nuc_change_key] += increment
+            globdict[neighbor_key][nuc_change_key] += increment
+
     return neighboring_nuc_dict
 
-#print(n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACACGCTCAATGTACAGATTTACCA'))
+# print(globdict)
+# n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACACGCTCAATGTACAGATTTACCA')
+# #print(n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACACGCTCAATGTACAGATTTACCA'))
+# print('\nglobe_dict:',globdict,'\n')
+# n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGGAGACGCTCAATGTCCAGATCTAACA')
+# print('\nglobe_dict:',globdict,'\n')
 """
 ATGCAGACGCTCAATGTGCAGATATACCA
 ATGCAcACGCTCAATGTaCAGATtTACCA
