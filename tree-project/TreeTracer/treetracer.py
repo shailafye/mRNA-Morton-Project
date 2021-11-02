@@ -65,6 +65,7 @@ class TreeTracer:
                             list_dicts_n0.append(output_dict)
                 if len(list_dicts_n0) > 0 and function_called == n0_context or function_called == fourfold_n0_context:
                     self.cumulative_mat = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts_n0)))
+        return self.cumulative_mat
         return True
 
     def print_cumulative_matrices(self):
@@ -127,13 +128,13 @@ class TreeTracer:
         return all_sequences
 
 
-tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
-print('fourfold')
-tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False)
-tree_obj.print_cumulative_matrices()
-print('normal')
-tree_obj.trace_tree_function(n0_context, branch_length=False)
-tree_obj.print_cumulative_matrices()
+# tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
+# print('fourfold')
+# tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False)
+# tree_obj.print_cumulative_matrices()
+# print('normal')
+# tree_obj.trace_tree_function(n0_context, branch_length=False)
+# tree_obj.print_cumulative_matrices()
 #print(tree_obj.final_matrix_dict)
 #print("\ncumulative:")
 #print(tree_obj.cumulative_mat)
