@@ -4,14 +4,13 @@ FASTA sequences for the tree.
 This class will parse the information and create a tree object using Phylo package from Biopython
 You can apply specific functions/analysis by specifying when creating an instance of TreeTracer class
 """
-import numpy as np
+
 from Bio import Phylo
-from treetracer_functions import n0_context, n1_context, globdict
+from treetracer_functions import n0_context, n1_context, n2_context
 import collections, functools, operator
 from collections import Counter
 from typing import Callable
 from matrix import Matrix
-
 
 
 class TreeTracer:
@@ -27,19 +26,22 @@ class TreeTracer:
         self.seq_dict = self.read_seqs()
         self.final_matrix_dict = {}
         self.cumulative_mat = {}
+        self.function_called = Callable
+        self.third_codon_sites = []
 
     def trace_tree_function(self, function_called: Callable, branch_length=True):
-        # iterate through all nodes
+        # iterate through all nodes and call function on parent node and child
+        self.function_called = function_called
         list_dicts_n0 = []
         for clade in self.tree.find_clades():
-            #print('Clade:', clade)
+            # print('Clade:', clade)
             if len(clade.clades) > 0:
-                #print('children:', clade.clades)
+                # print('children:', clade.clades)
                 for child in clade.clades:
-                    #print('child: ', child.branch_length)
+                    # print('child: ', child.branch_length)
                     # add if statement to check if in dictionary
                     if str(clade) in self.seq_dict and str(child) in self.seq_dict:
-                        # print('pair:',clade, ' and ',child)
+                        #print('pair:',clade, ' and ',child)
                         # print(type(clade.name))
                         seq1 = self.seq_dict[clade.name]
                         seq2 = self.seq_dict[child.name]
@@ -49,14 +51,13 @@ class TreeTracer:
                         else:
                             output_dict = function_called(seq1, seq2, increment=1.0)
                         self.final_matrix_dict[key] = output_dict
-                        print(type(function_called))
                         if function_called != n0_context:
                             # update cumulative dictionary of total changes at neighboring sites
                             for neighbor in output_dict:
                                 if neighbor in self.cumulative_mat:
                                     one = Counter(self.cumulative_mat[neighbor])
                                     two = Counter(output_dict[neighbor])
-                                    self.cumulative_mat[neighbor] = dict(one+two)
+                                    self.cumulative_mat[neighbor] = dict(one + two)
                                 else:
                                     self.cumulative_mat[neighbor] = output_dict[neighbor]
                         elif function_called == n0_context:
@@ -65,6 +66,26 @@ class TreeTracer:
                     self.cumulative_mat = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts_n0)))
         return True
 
+    def print_cumulative_matrices(self):
+        matrix = Matrix(self.cumulative_mat)
+        if self.function_called == n0_context:
+            matrix.n0_matrix()
+        else:
+            matrix.ngt0_matrix()
+        return True
+
+    def get_3rd_codon_sites(self):
+        """
+        find all third codon sites
+        in the functions, check if those sites are 2 or 4 fold
+        Assign:
+        self.third_codon_sites
+        :return: True if successfully assign self.third_codon_sites list []
+        """
+        min_val = max([len(self.seq_dict[ele]) for ele in self.seq_dict])
+        for nt_idx in range(2, min_val, 3):
+            self.third_codon_sites.append(nt_idx)
+        return True
 
 
     def draw_tree(self, tree_type: str = 'ascii'):
@@ -104,8 +125,11 @@ class TreeTracer:
             all_sequences[gene_name] = lines[line + 1].strip()
         return all_sequences
 
+
 tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
-tree_obj.trace_tree_function(n1_context, branch_length=False)
-print(tree_obj.final_matrix_dict)
-print("\ncumulative:")
-print(tree_obj.cumulative_mat)
+tree_obj.trace_tree_function(n0_context, branch_length=False)
+#print(tree_obj.final_matrix_dict)
+#print("\ncumulative:")
+#print(tree_obj.cumulative_mat)
+#tree_obj.print_cumulative_matrices()
+tree_obj.get_3rd_codon_sites()
