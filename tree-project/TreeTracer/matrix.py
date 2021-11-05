@@ -10,6 +10,7 @@ class Matrix:
         self.cumulative_matrix_dict = cumulative_matrix_dict
 
     def ngt0_matrix(self):
+        all_matrices = {}
         for key in self.cumulative_matrix_dict:
             arr_zero = np.full((4, 4), 0, dtype=int)
             matrix_dict = self.cumulative_matrix_dict[key]
@@ -21,7 +22,8 @@ class Matrix:
                 j = k[1]
                 matrix_arr[conversion[i]][conversion[j]] = float(val)
             print(key, '\n', matrix_arr)
-        return True
+            all_matrices[key] = matrix_arr
+        return all_matrices
 
     def n0_matrix(self):
         arr_zero = np.full((4, 4), 0, dtype=int)
@@ -34,4 +36,4 @@ class Matrix:
             j = k[1]
             matrix_arr[conversion[i]][conversion[j]] = float(val)
         print(matrix_arr)
-        return True
+        return matrix_arr

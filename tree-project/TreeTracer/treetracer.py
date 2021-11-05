@@ -66,15 +66,15 @@ class TreeTracer:
                 if len(list_dicts_n0) > 0 and function_called == n0_context or function_called == fourfold_n0_context:
                     self.cumulative_mat = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts_n0)))
         return self.cumulative_mat
-        return True
+        #return True
 
     def print_cumulative_matrices(self):
         matrix = Matrix(self.cumulative_mat)
         if self.function_called == n0_context or self.function_called == fourfold_n0_context:
-            matrix.n0_matrix()
+            return matrix.n0_matrix()
         else:
-            matrix.ngt0_matrix()
-        return True
+            return matrix.ngt0_matrix()
+        return None
 
     def get_3rd_codon_sites(self):
         """
