@@ -28,6 +28,7 @@ class TreeTracer:
         self.cumulative_mat = {}
         self.function_called = Callable
         self.third_codon_sites = self.get_3rd_codon_sites()
+        # call the tree_trace function and get all the possible matrix dictionaries and store as instance variables
 
     def trace_tree_function(self, function_called: Callable, branch_length=True):
         # iterate through all nodes and call function on parent node and child
@@ -46,11 +47,13 @@ class TreeTracer:
                         seq1 = self.seq_dict[clade.name]
                         seq2 = self.seq_dict[child.name]
                         key = str(clade.name + ', ' + child.name)
+                        # call the function and return that dictionary
                         if branch_length:
                             output_dict = function_called(seq1, seq2, increment=child.branch_length, codon_sites=self.third_codon_sites)
                         else:
                             output_dict = function_called(seq1, seq2, increment=1.0, codon_sites=self.third_codon_sites)
                         self.final_matrix_dict[key] = output_dict
+                        # update the cumulative matrix --> different if its n0 context because no neighboring pairs
                         if function_called == n1_context or function_called == n2_context or \
                                 function_called == fourfold_n1_context or function_called == fourfold_n2_context:
                             # update cumulative dictionary of total changes at neighboring sites
@@ -66,18 +69,20 @@ class TreeTracer:
                 if len(list_dicts_n0) > 0 and function_called == n0_context or function_called == fourfold_n0_context:
                     self.cumulative_mat = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts_n0)))
         return self.cumulative_mat
-        #return True
 
     def print_cumulative_matrices(self):
+        # create an instance of Matrix class
         matrix = Matrix(self.cumulative_mat)
         if self.function_called == n0_context or self.function_called == fourfold_n0_context:
             return matrix.n0_matrix()
-        else:
+        elif self.function_called == n1_context or self.function_called == n2_context or \
+                self.function_called == fourfold_n1_context or self.function_called == fourfold_n2_context:
             return matrix.ngt0_matrix()
         return None
 
     def get_3rd_codon_sites(self):
         """
+        #consider adding in degeneracy here!!
         find all third codon sites
         in the functions, check if those sites are 2 or 4 fold
         Assign:
@@ -128,14 +133,20 @@ class TreeTracer:
         return all_sequences
 
 
-# tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
-# print('fourfold')
-# tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False)
-# tree_obj.print_cumulative_matrices()
-# print('normal')
-# tree_obj.trace_tree_function(n0_context, branch_length=False)
-# tree_obj.print_cumulative_matrices()
+
+tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
+print('fourfold')
+
+tree_obj.trace_tree_function(fourfold_n1_context, branch_length=False)
+tree_obj.print_cumulative_matrices()
+print('normal')
+tree_obj.trace_tree_function(n1_context, branch_length=False)
+tree_obj.print_cumulative_matrices()
+print('\nn0')
+tree_obj.trace_tree_function(n0_context, branch_length=False)
+tree_obj.print_cumulative_matrices()
+#tree_obj.draw_tree('normal')
 #print(tree_obj.final_matrix_dict)
 #print("\ncumulative:")
-#print(tree_obj.cumulative_mat)
+print(tree_obj.cumulative_mat)
 #tree_obj.print_cumulative_matrices()
