@@ -1,4 +1,4 @@
-giimport itertools
+import itertools
 
 
 def n0_context(seq1, seq2):
@@ -46,7 +46,17 @@ def n1_context(seq1, seq2):
             nuc_change_key = str(seq1[i]) + str(seq2[i]) #AT, TG
             #change_dict[nuc_change] += 1
             # check to see if neighboring nt exists in dictionary
-            neighbor_key = str(seq1[i-1]) + '_' + str(seq1[i+1]) # key = X_X of sequence 1
+            neighbor_key = ''
+            if seq1[i-1] is None:
+               neighbor_key = '_' + str(seq1[i+1])
+            elif seq1[i+1] is None:
+               neighbor_key = str(seq1[i-1]) + '_'
+            else:
+                neighbor_key = str(seq1[i-1]) + '_' + str(seq1[i+1]) # key = X_X of sequence 1
+
+            other_neighbor_key = str(seq2[i - 1]) + '_' + str(seq2[i + 1])
+            if neighbor_key != other_neighbor_key:
+                continue
             if neighbor_key not in neighboring_nuc_dict:
                 # initialize a new dictionary inside of neighboring_nuc_dict
                 change_dict = {}
@@ -60,18 +70,50 @@ def n1_context(seq1, seq2):
             neighboring_nuc_dict[neighbor_key][nuc_change_key] += 1
     return neighboring_nuc_dict
 
-print(n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACACGCTCAATGTACAGATTTACCA'))
+print(n1_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'CTGCACACGCTCAATGTACAGATTTACCA'))
 """
 ATGCAGACGCTCAATGTGCAGATATACCA
-ATGCAcACGCTCAATGTaCAGATtTACCA
+cTGCAcACGCTCAATGTaCAGATtTACCA
 AA --> gc
 TC --> ga
 TT --> at
 """
 
-
 def n2_context(seq1, seq2):
-    """
+    neighboring_nuc_dict = {}
+    for i in range(min(len(seq1), len(seq2))):
+        if seq1[i] == seq2[i]:
+            continue
+        elif seq1[i] != seq2[i] and i > 0:
+            nuc_change_key = str(seq1[i]) + str(seq2[i]) #AT, TG
+            #change_dict[nuc_change] += 1
+            # check to see if neighboring nt exists in dictionary
+            '''if seq1[i-1] is None:
+                neighbor_key = '_' + str(seq1[i+1])
+            elif seq1[i+1] is None:
+                neighbor_key = str(seq1[i-1]) + '_' '''
+            neighbor_key = str(seq1[i-2] + str(seq1[i-1]) + '_' + str(seq1[i+1]) + str(seq1[i+2])) # key = X_X of sequence 1
+            other_neighbor_key = str(seq2[i - 2] + str(seq2[i - 1]) + '_' + str(seq2[i + 1]) + str(seq2[i + 2]))
+            if neighbor_key != other_neighbor_key:
+                continue
+            if neighbor_key not in neighboring_nuc_dict:
+                # initialize a new dictionary inside of neighboring_nuc_dict
+                change_dict = {}
+                nucleotides = ['A', 'T', 'G', 'C']
+                combos = list(itertools.product(nucleotides, nucleotides))
+                # initialize dictionary
+                for k in combos:
+                    key = str(k[0] + k[1])
+                    change_dict[key] = 0
+                neighboring_nuc_dict[neighbor_key] = change_dict
+            neighboring_nuc_dict[neighbor_key][nuc_change_key] += 1
+    return neighboring_nuc_dict
 
-
-    """
+#print(n2_context('ATGCAGACGCTCAATGTGCAGATATACCA', 'ATGCACTCGCTCAATGTACAGATTTACCA'))
+"""
+ATGCAGACGCTCAATGTGCAGATATACCA
+ATGCActCGCTCAATGTaCAGATtTACCA
+AA --> gc
+TC --> ga
+TT --> at
+"""

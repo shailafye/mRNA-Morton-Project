@@ -25,6 +25,19 @@ class TreeTracer:
         self.sum_matrix_dict = {}
 
     def read_seqs(self):
+        import dna_sequence as dna
+        all_sequences = {}
+        infile = open(self.file_name, 'r')
+        lines = infile.readlines()
+        infile.close()
+        for line in range(0, len(lines), 2):
+            gene_name = lines[line].strip()[1:]
+            gene_name = gene_name.strip(' ').split(" ")[0]
+            gene_name = gene_name.split(" ")[0]
+            all_sequences[gene_name] = dna.DNASequence(lines[line + 1].strip(), True)
+        return all_sequences
+
+    '''def read_seqs(self):
         all_sequences = {}
         infile = open(self.file_name, 'r')
         lines = infile.readlines()
@@ -34,7 +47,7 @@ class TreeTracer:
             gene_name = gene_name.strip(' ').split(" ")[0]
             gene_name = gene_name.split(" ")[0]
             all_sequences[gene_name] = lines[line + 1].strip()
-        return all_sequences
+        return all_sequences'''
 
     def draw_tree(self, tree_type: str = 'ascii'):
         """
@@ -68,8 +81,8 @@ class TreeTracer:
                     if str(clade) in self.seq_dict and str(child) in self.seq_dict:
                         # print('pair:',clade, ' and ',child)
                         # print(type(clade.name))
-                        seq1 = self.seq_dict[clade.name]
-                        seq2 = self.seq_dict[child.name]
+                        seq1 = self.seq_dict[clade.name].sequence
+                        seq2 = self.seq_dict[child.name].sequence
                         key = str(clade.name + ', ' + child.name)
                         self.final_matrix_dict[key] = function_called(seq1, seq2)
                         list_dicts.append(function_called(seq1, seq2))
