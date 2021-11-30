@@ -5,6 +5,18 @@ This class will parse the information and create a tree object using Phylo packa
 You can apply specific functions/analysis by specifying when creating an instance of TreeTracer class
 """
 
+"""
+TODO:
+- outgroup specification for loop, don't include the branch comparisons
+- store the dictionary of all of the species to species relationships
+- function to only include same codons throughout the tree
+- sum of the off diagonals  
+
+"""
+
+
+
+
 from Bio import Phylo
 from treetracer_functions import n0_context, n1_context, n2_context, fourfold_n0_context, fourfold_n1_context, fourfold_n2_context
 import collections, functools, operator
