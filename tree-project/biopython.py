@@ -13,7 +13,7 @@ parse(), read(), write() and convert()
 
 tree = Phylo.read('iqtree_newick.txt', 'newick')
 # print(tree.root)
-# print(tree)
+print(tree)
 # tree.to_alignment()
 # print(tree.distance('Node3', 'Zea'))
 # print(tree.clade[1][1])
