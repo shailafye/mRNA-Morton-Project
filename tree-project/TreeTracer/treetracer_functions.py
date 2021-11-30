@@ -9,7 +9,7 @@ FOURFOLD = ['CTT', 'CTC', 'CTA', 'CTG', 'GTT', 'GTC', 'GTA', 'GTG', 'ACT', 'ACC'
             'GGT', 'GGC', 'GGA', 'GGG', 'CGT', 'CGC', 'CGA', 'CGG']
 TWOFOLD = ['TTT', 'TTC', 'TTA', 'TTG', 'TAT', 'TAC', 'TGT', 'TGC', 'CAT', 'CAC', 'CAA', 'CAG',
            'AAT', 'AAC', 'AAA', 'AAG', 'GAT', 'GAC', 'GAA', 'GAG', 'AGT', 'AGC', 'AGA', 'AGG']
-##SHOULD I INCLUDE STOP CODONS?
+
 
 def n0_context(seq1, seq2, increment=1.0, codon_sites=[]):
     seq1 = seq1.upper()

@@ -37,3 +37,9 @@ class Matrix:
             matrix_arr[conversion[i]][conversion[j]] = float(val)
         print(matrix_arr)
         return matrix_arr
+
+
+    # add functions
+    # off diagonal
+    # transitions, transversions
+    #totals
