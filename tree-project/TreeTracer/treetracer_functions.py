@@ -1,7 +1,7 @@
 """
 This file: treetracer_functions.py is a file with helper functions for TreeTracer class
 """
-
+import pandas as pd
 import itertools
 
 FOURFOLD = ['CTT', 'CTC', 'CTA', 'CTG', 'GTT', 'GTC', 'GTA', 'GTG', 'ACT', 'ACC', 'ACA', 'ACG',
@@ -188,18 +188,42 @@ def check_2fold(codon):
         return False
     return codon in TWOFOLD
 
+"""
+Create function to iterate and store each codon site as a dictionary with 
+    key being codon site and value is a tuple
+    tuple is (seq1-name_seq2-name, codon_site CTCG) --> C is the third codon position 
+    and we are keeping track of the next codon
+"""
 
 
+def site_changes(seq1, seq2, codon_sites=[]):
+    """
+    :param seq1: sequence of node
+    :param seq2: sequence of child
+    :param codon_sites: list of codon sites
+    :return: a dataframe with columns being site, pair name, and codon information = CTCG - CTCC
+    """
+    seq1 = seq1.upper()
+    seq2 = seq2.upper()
+    # site[2] = [(CTCG,CTGG),nuc_change,codon_dif=T or F]
+    site_dict = {}
+    for i in range(2, min(len(seq1), len(seq2)) - 1):
+        # if you have something like CTCG CATG --> FALSE because there was a change in sequence/codon context
+        codon_good = True
+        if i not in codon_sites:
+            continue
+        if not check_4fold(seq1[i - 2:i+1]):
+            continue
+        # check this
+        neighbor_key1 = str(seq1[i - 1]) + '_' + str(seq1[i + 1])  # key = X_X of sequence 1
+        neighbor_key2 = str(seq2[i - 1]) + '_' + str(seq2[i + 1])  # key = X_X of sequence 2
+        if neighbor_key1 != neighbor_key2:
+            codon_good = False
+            # can add continue back in if you want to ignore the ones that aren't same codon position
+            # continue
+        nuc_change = str(seq1[i]) + str(seq2[i])
+        site_dict[i] = [(seq1[i - 2:i+2], seq2[i - 2:i+2]), nuc_change, codon_good]
+    #print(site_dict)
+    return site_dict
 
-# #
-# seq1 = 'ATGACACAGATTTCGAGACGGAGGGCCCATATATAGCGATCTAGCGAGGCGACTCAT'
-# seq2 = 'ATGACcCAGATaTCGAGACGGAGGGCCCATATATAGCGATCTAGCGAGGCGACTCAT'
-# # AC_CA and AT_TC
-#
-# list_sites = []
-# for i in range(2,len(seq2),3):
-#     list_sites.append(i)
-#
-# dicts = fourfold_n1_context(seq1, seq2, codon_sites = list_sites)
-# #print(dicts)
-# print(dicts['C_C'])
+

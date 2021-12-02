@@ -38,6 +38,12 @@ class Matrix:
         print(matrix_arr)
         return matrix_arr
 
+    """
+    Crear
+    """
+
+    def
+
 
     # add functions
     # off diagonal

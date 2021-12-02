@@ -18,7 +18,8 @@ TODO:
 
 
 from Bio import Phylo
-from treetracer_functions import n0_context, n1_context, n2_context, fourfold_n0_context, fourfold_n1_context, fourfold_n2_context
+from treetracer_functions import n0_context, n1_context, n2_context, fourfold_n0_context, fourfold_n1_context, \
+    fourfold_n2_context, site_changes
 import collections, functools, operator
 from collections import Counter
 from typing import Callable
@@ -40,9 +41,12 @@ class TreeTracer:
         self.cumulative_mat = {}
         self.function_called = Callable
         self.third_codon_sites = self.get_3rd_codon_sites()
+        # changes dictionary of each site --> key is node2:Zea and value is [(CTCG,CTGG),nuc_change,codon_dif=T or F]
+        self.site_changes_dict = {}
+
         # call the tree_trace function and get all the possible matrix dictionaries and store as instance variables
 
-    def trace_tree_function(self, function_called: Callable, branch_length=True):
+    def trace_tree_function(self, function_called: Callable, branch_length=True, outgroup='Lilium'):
         # iterate through all nodes and call function on parent node and child
         self.function_called = function_called
         list_dicts_n0 = []
@@ -51,10 +55,14 @@ class TreeTracer:
             if len(clade.clades) > 0:
                 # print('children:', clade.clades)
                 for child in clade.clades:
+                    # skip comparison of outgroup --> go to next for loop iteration line above
+                    if outgroup in str(child):
+                        print('outgroup:', child)
+                        continue
                     # print('child: ', child.branch_length)
                     # add if statement to check if in dictionary
                     if str(clade) in self.seq_dict and str(child) in self.seq_dict:
-                        #print('pair:',clade, ' and ',child)
+                        # print('pair:',clade, ' and ',child)
                         # print(type(clade.name))
                         seq1 = self.seq_dict[clade.name]
                         seq2 = self.seq_dict[child.name]
@@ -99,7 +107,7 @@ class TreeTracer:
         in the functions, check if those sites are 2 or 4 fold
         Assign:
         self.third_codon_sites
-        :return: True if successfully assign self.third_codon_sites list []
+        :return: sites if successfully assign self.third_codon_sites list []
         """
         sites = []
         min_val = max([len(self.seq_dict[ele]) for ele in self.seq_dict])
@@ -144,21 +152,49 @@ class TreeTracer:
             all_sequences[gene_name] = lines[line + 1].strip()
         return all_sequences
 
+    def special_trace_tree_function(self, outgroup='Lilium'):
+        # iterate through all nodes and call function on parent node and child
+        list_dicts_n0 = []
+        for clade in self.tree.find_clades():
+            # print('Clade:', clade)
+            if len(clade.clades) > 0:
+                # print('children:', clade.clades)
+                for child in clade.clades:
+                    # skip comparison of outgroup --> go to next for loop iteration line above
+                    if outgroup in str(child):
+                        print('outgroup:', child)
+                        continue
+                    # print('child: ', child.branch_length)
+                    # add if statement to check if in dictionary
+                    if str(clade) in self.seq_dict and str(child) in self.seq_dict:
+                        #print('pair:',clade, ' and ',child)
+                        # print(type(clade.name))
+                        seq1 = self.seq_dict[clade.name]
+                        seq2 = self.seq_dict[child.name]
+                        key = str(clade.name + ', ' + child.name)
+                        # call the function and return that dictionary
+                        rd = site_changes(seq1, seq2, self.third_codon_sites)
+                        self.site_changes_dict[str(clade.name+':'+child.name)] = rd
+        return self.site_changes_dict
 
 
 tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
-print('fourfold')
 
-tree_obj.trace_tree_function(fourfold_n1_context, branch_length=False)
-tree_obj.print_cumulative_matrices()
-print('normal')
-tree_obj.trace_tree_function(n1_context, branch_length=False)
-tree_obj.print_cumulative_matrices()
-print('\nn0')
-tree_obj.trace_tree_function(n0_context, branch_length=False)
-tree_obj.print_cumulative_matrices()
-#tree_obj.draw_tree('normal')
-#print(tree_obj.final_matrix_dict)
+# print('fourfold')
+# tree_obj.trace_tree_function(fourfold_n1_context, branch_length=False)
+# tree_obj.print_cumulative_matrices()
+# print('normal')
+# tree_obj.trace_tree_function(n1_context, branch_length=False)
+# tree_obj.print_cumulative_matrices()
+print('site changes function')
+tree_obj.special_trace_tree_function(outgroup='Lilium')
+print(tree_obj.site_changes_dict)
+#tree_obj.print_cumulative_matrices()
+# print("with outgroup")
+# tree_obj.trace_tree_function(n0_context, branch_length=False, outgroup='Lilium')
+# tree_obj.print_cumulative_matrices()
+# #tree_obj.draw_tree()
+# print(tree_obj.final_matrix_dict)
 #print("\ncumulative:")
-print(tree_obj.cumulative_mat)
+#print(tree_obj.cumulative_mat)
 #tree_obj.print_cumulative_matrices()
