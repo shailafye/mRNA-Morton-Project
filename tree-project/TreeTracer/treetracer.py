@@ -7,14 +7,12 @@ You can apply specific functions/analysis by specifying when creating an instanc
 
 """
 TODO:
-- outgroup specification for loop, don't include the branch comparisons
-- store the dictionary of all of the species to species relationships
+- outgroup specification for loop, don't include the branch comparisons - DONE
+- store the dictionary of all of the species to species relationships - ?DONE
 - function to only include same codons throughout the tree
 - sum of the off diagonals  
 
 """
-
-
 
 
 from Bio import Phylo
@@ -177,18 +175,38 @@ class TreeTracer:
                         self.site_changes_dict[str(clade.name+':'+child.name)] = rd
         return self.site_changes_dict
 
+    def get_site_matrix(self):
+        matrix = Matrix(all_site_dict=self.site_changes_dict)
+        print(matrix.site_matrix())
+        matrix.sum_off_diagonal()
+
 
 tree_obj = TreeTracer('../iqtree_newick.txt', '../grass_rbcl_nodes_seq_fasta.txt')
+print('site changes function')
+tree_obj.special_trace_tree_function(outgroup='Lilium')
+#print(tree_obj.site_changes_dict)
+
+dict_sites = tree_obj.site_changes_dict
+#print(dict_sites)
+tree_obj.get_site_matrix()
+
+
+# set1 = list(dict_sites['Node1:Node2'].keys())
+# #print(set1)
+# for key in dict_sites.keys():
+#     set2=list(dict_sites[key].keys())
+#     if set2 in set1 or set1 in set2:
+#         print(key)
+        #print(dict_sites[key].keys())
+#print(dict_sites.keys())
 
 # print('fourfold')
-# tree_obj.trace_tree_function(fourfold_n1_context, branch_length=False)
+#tree_obj.trace_tree_function(fourfold_n1_context, branch_length=False)
 # tree_obj.print_cumulative_matrices()
 # print('normal')
 # tree_obj.trace_tree_function(n1_context, branch_length=False)
-# tree_obj.print_cumulative_matrices()
-print('site changes function')
-tree_obj.special_trace_tree_function(outgroup='Lilium')
-print(tree_obj.site_changes_dict)
+#tree_obj.print_cumulative_matrices()
+
 #tree_obj.print_cumulative_matrices()
 # print("with outgroup")
 # tree_obj.trace_tree_function(n0_context, branch_length=False, outgroup='Lilium')

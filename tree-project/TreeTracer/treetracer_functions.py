@@ -223,7 +223,7 @@ def site_changes(seq1, seq2, codon_sites=[]):
             # continue
         nuc_change = str(seq1[i]) + str(seq2[i])
         site_dict[i] = [(seq1[i - 2:i+2], seq2[i - 2:i+2]), nuc_change, codon_good]
-    #print(site_dict)
+    print(site_dict)
     return site_dict
 
 
