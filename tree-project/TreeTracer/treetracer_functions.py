@@ -10,6 +10,16 @@ FOURFOLD = ['CTT', 'CTC', 'CTA', 'CTG', 'GTT', 'GTC', 'GTA', 'GTG', 'ACT', 'ACC'
 TWOFOLD = ['TTT', 'TTC', 'TTA', 'TTG', 'TAT', 'TAC', 'TGT', 'TGC', 'CAT', 'CAC', 'CAA', 'CAG',
            'AAT', 'AAC', 'AAA', 'AAG', 'GAT', 'GAC', 'GAA', 'GAG', 'AGT', 'AGC', 'AGA', 'AGG']
 
+def check_nt(nt1, nt2):
+    """
+    Function that takes two nucleotides and confirms they are ATGC and not - or X
+    """
+    nucleotides = ['A', 'T', 'G', 'C']
+    if nt1.upper() in nucleotides and nt2.upper()  in nucleotides:
+        return True
+    else:
+        return False
+
 
 def n0_context(seq1, seq2, increment=1.0, codon_sites=[]):
     seq1 = seq1.upper()
@@ -22,6 +32,8 @@ def n0_context(seq1, seq2, increment=1.0, codon_sites=[]):
         key = str(i[0] + i[1])
         change_dict[key] = 0
     for i in range(min(len(seq1), len(seq2))):
+        if not check_nt(str(seq1[i]), str(seq2[i])):
+            continue
         nuc_change = str(seq1[i]) + str(seq2[i])
         change_dict[nuc_change] += increment
     return change_dict
@@ -33,6 +45,8 @@ def n1_context(seq1, seq2, increment=1.0, codon_sites=[]):
     increment = float(increment)
     neighboring_nuc_dict = {}
     for i in range(1, min(len(seq1), len(seq2)) - 1):
+        if not check_nt(str(seq1[i]), str(seq2[i])):
+            continue
         nuc_change_key = str(seq1[i]) + str(seq2[i])  # AT, TG
         # change_dict[nuc_change] += 1
         # check to see if neighboring nt exists in dictionary
@@ -62,6 +76,8 @@ def n2_context(seq1, seq2, increment=1.0, codon_sites=[]):
     neighboring_nuc_dict = {}
     # change_dict = {}
     for i in range(2, min(len(seq1), len(seq2)) - 2):
+        if not check_nt(str(seq1[i]), str(seq2[i])):
+            continue
         nuc_change_key = str(seq1[i]) + str(seq2[i])  # AT, TG
         # change_dict[nuc_change] += 1
         # check to see if neighboring nt exists in dictionary
@@ -94,6 +110,8 @@ def fourfold_n0_context(seq1, seq2, increment=1.0, codon_sites=[]):
         key = str(i[0] + i[1])
         change_dict[key] = 0
     for i in range(min(len(seq1), len(seq2))):
+        if not check_nt(str(seq1[i]), str(seq2[i])):
+            continue
         if i not in codon_sites:
             continue
         if not check_4fold(seq1[i - 2:i+1]):
