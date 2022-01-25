@@ -188,14 +188,14 @@ if __name__ == '__main__':
     newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
     tree_obj = TreeTracer(newick_path, seq_path)
     #tree_obj.draw_tree()
-    # tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False, outgroup =['Pinus', 'Ginkgo'])
-    # tree_obj.print_cumulative_matrices()
+    tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False, outgroup =['Pinus', 'Ginkgo'])
+    tree_obj.print_cumulative_matrices()
     # tree_obj.trace_tree_function(n0_context, branch_length=False, outgroup=['Pinus', 'Ginkgo'])
     # print(dict_sites)
     # tree_obj.print_cumulative_matrices()
-    tree_obj.special_trace_tree_function(outgroup =['Pinus', 'Ginkgo'])
-    print(tree_obj.site_changes_dict)
-    tree_obj.get_site_matrix()
+    # tree_obj.special_trace_tree_function(outgroup =['Pinus', 'Ginkgo'])
+    # print(tree_obj.site_changes_dict)
+    # tree_obj.get_site_matrix()
 
 
 # set1 = list(dict_sites['Node1:Node2'].keys())
