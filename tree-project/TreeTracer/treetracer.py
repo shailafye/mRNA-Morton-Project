@@ -22,6 +22,7 @@ import collections, functools, operator
 from collections import Counter
 from typing import Callable
 from matrix import Matrix
+import pandas as pd
 
 
 class TreeTracer:
@@ -172,7 +173,7 @@ class TreeTracer:
                         seq2 = self.seq_dict[child.name]
                         key = str(clade.name + ', ' + child.name)
                         # call the function and return that dictionary
-                        rd = site_changes(seq1, seq2, self.third_codon_sites)
+                        rd = site_changes(seq1, seq2, child.branch_length, self.third_codon_sites)
                         self.site_changes_dict[str(clade.name+':'+child.name)] = rd
         return self.site_changes_dict
 
@@ -182,20 +183,30 @@ class TreeTracer:
         print("off diagonal")
         matrix.sum_off_diagonal()
 
+    def get_site_dataframe(self):
+        matrix = Matrix(all_site_dict=self.site_changes_dict)
+        matrix.site_changes_table()
+
+
+
 
 if __name__ == '__main__':
-    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
-    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
+    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/iqtree_newick.txt'
+        #'/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
+    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/grass_rbcl_nodes_seq_fasta.txt'
+        #'/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
     tree_obj = TreeTracer(newick_path, seq_path)
     #tree_obj.draw_tree()
-    tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False, outgroup =['Pinus', 'Ginkgo'])
-    tree_obj.print_cumulative_matrices()
+    # tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False, outgroup=['Pinus', 'Ginkgo'])
+    # tree_obj.print_cumulative_matrices()
     # tree_obj.trace_tree_function(n0_context, branch_length=False, outgroup=['Pinus', 'Ginkgo'])
     # print(dict_sites)
     # tree_obj.print_cumulative_matrices()
-    # tree_obj.special_trace_tree_function(outgroup =['Pinus', 'Ginkgo'])
-    # print(tree_obj.site_changes_dict)
-    # tree_obj.get_site_matrix()
+    tree_obj.special_trace_tree_function(outgroup =['Pinus', 'Ginkgo'])
+    tree_obj.get_site_dataframe()
+
+    #print(tree_obj.site_changes_dict)
+    #tree_obj.get_site_matrix()
 
 
 # set1 = list(dict_sites['Node1:Node2'].keys())

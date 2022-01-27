@@ -10,12 +10,13 @@ FOURFOLD = ['CTT', 'CTC', 'CTA', 'CTG', 'GTT', 'GTC', 'GTA', 'GTG', 'ACT', 'ACC'
 TWOFOLD = ['TTT', 'TTC', 'TTA', 'TTG', 'TAT', 'TAC', 'TGT', 'TGC', 'CAT', 'CAC', 'CAA', 'CAG',
            'AAT', 'AAC', 'AAA', 'AAG', 'GAT', 'GAC', 'GAA', 'GAG', 'AGT', 'AGC', 'AGA', 'AGG']
 
+
 def check_nt(nt1, nt2):
     """
     Function that takes two nucleotides and confirms they are ATGC and not - or X
     """
     nucleotides = ['A', 'T', 'G', 'C']
-    if nt1.upper() in nucleotides and nt2.upper()  in nucleotides:
+    if nt1.upper() in nucleotides and nt2.upper() in nucleotides:
         return True
     else:
         return False
@@ -114,7 +115,7 @@ def fourfold_n0_context(seq1, seq2, increment=1.0, codon_sites=[]):
             continue
         if i not in codon_sites:
             continue
-        if not check_4fold(seq1[i - 2:i+1]):
+        if not check_4fold(seq1[i - 2:i + 1]):
             continue
         nuc_change = str(seq1[i]) + str(seq2[i])
         change_dict[nuc_change] += increment
@@ -127,9 +128,11 @@ def fourfold_n1_context(seq1, seq2, increment=1.0, codon_sites=[]):
     increment = float(increment)
     neighboring_nuc_dict = {}
     for i in range(2, min(len(seq1), len(seq2)) - 1):
+        if not check_nt(str(seq1[i]), str(seq2[i])):
+            continue
         if i not in codon_sites:
             continue
-        if not check_4fold(seq1[i - 2:i+1]):
+        if not check_4fold(seq1[i - 2:i + 1]):
             continue
         nuc_change_key = str(seq1[i]) + str(seq2[i])  # AT, TG
         # change_dict[nuc_change] += 1
@@ -160,9 +163,11 @@ def fourfold_n2_context(seq1, seq2, increment=1.0, codon_sites=[]):
     neighboring_nuc_dict = {}
     # change_dict = {}
     for i in range(2, min(len(seq1), len(seq2)) - 2):
+        if not check_nt(str(seq1[i]), str(seq2[i])):  # makes sure its ATGC not X or -
+            continue
         if i not in codon_sites:
             continue
-        if not check_4fold(seq1[i - 2:i+1]):
+        if not check_4fold(seq1[i - 2:i + 1]):
             continue
         nuc_change_key = str(seq1[i]) + str(seq2[i])  # AT, TG
         # change_dict[nuc_change] += 1
@@ -206,6 +211,7 @@ def check_2fold(codon):
         return False
     return codon in TWOFOLD
 
+
 """
 Create function to iterate and store each codon site as a dictionary with 
     key being codon site and value is a tuple
@@ -214,12 +220,14 @@ Create function to iterate and store each codon site as a dictionary with
 """
 
 
-def site_changes(seq1, seq2, codon_sites=[]):
+def site_changes(seq1, seq2, branch_length, codon_sites=[]):
     """
     :param seq1: sequence of node
     :param seq2: sequence of child
+    :param branch_length: length of child to node
     :param codon_sites: list of codon sites
-    :return: a dataframe with columns being site, pair name, and codon information = CTCG - CTCC
+    :return: a dictionary with 1178: [('TCTT', 'ATCT'), 'TC', False, branch_length] -
+            site, context, change, if site context same, branch length
     """
     seq1 = seq1.upper()
     seq2 = seq2.upper()
@@ -228,9 +236,11 @@ def site_changes(seq1, seq2, codon_sites=[]):
     for i in range(2, min(len(seq1), len(seq2)) - 1):
         # if you have something like CTCG CATG --> FALSE because there was a change in sequence/codon context
         codon_good = True
+        if not check_nt(str(seq1[i]), str(seq2[i])):
+            continue
         if i not in codon_sites:
             continue
-        if not check_4fold(seq1[i - 2:i+1]):
+        if not check_4fold(seq1[i - 2:i + 1]):
             continue
         # check this
         neighbor_key1 = str(seq1[i - 1]) + '_' + str(seq1[i + 1])  # key = X_X of sequence 1
@@ -240,8 +250,6 @@ def site_changes(seq1, seq2, codon_sites=[]):
             # can add continue back in if you want to ignore the ones that aren't same codon position
             # continue
         nuc_change = str(seq1[i]) + str(seq2[i])
-        site_dict[i] = [(seq1[i - 2:i+2], seq2[i - 2:i+2]), nuc_change, codon_good]
-    print(site_dict)
+        site_dict[i] = [(seq1[i - 2:i + 2], seq2[i - 2:i + 2]), nuc_change, codon_good, round(branch_length, 4)]
+    # print(site_dict)
     return site_dict
-
-
