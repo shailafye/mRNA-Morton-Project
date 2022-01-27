@@ -2,7 +2,7 @@ infile = open('/Users/cindyruan/Documents/Morton-Research/2021-research/poaceae_
 file = infile.read()
 infile.close()
 
-outfile = open('/Users/cindyruan/Documents/Morton-Research/2021-research/edited_poaceae_rbcl_alignment.txt', 'w')
+outfile = open('/2021-research/poaceae_analysis/edited_poaceae_rbcl_alignment.txt', 'w')
 
 species_segment = file.split('\n\n')[0]
 species_list = species_segment.split('\n')[1:]
