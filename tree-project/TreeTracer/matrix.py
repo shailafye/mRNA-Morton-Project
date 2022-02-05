@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import itertools
 
+
 def create_nt_dict():
     change_dict = {}
     nucleotides = ['A', 'T', 'G', 'C']
@@ -22,8 +23,9 @@ class Matrix:
         self.cumulative_matrix_dict = cumulative_matrix_dict
         self.all_site_dict = all_site_dict
         self.site_dict = {}
+        self.all_change_site_dict = {}
 
-    def ngt0_matrix(self, input_dict = None):
+    def ngt0_matrix(self, input_dict=None):
         all_matrices = {}
         print(self.cumulative_matrix_dict)
         mat_dict = input_dict or self.cumulative_matrix_dict
@@ -78,53 +80,130 @@ class Matrix:
                         site_dict[site][change_key] += 1
         print(site_dict)
         self.site_dict = site_dict
-        #self.ngt0_matrix(site_dict)
-        return #self.ngt0_matrix(site_dict)
-
+        # self.ngt0_matrix(site_dict)
+        return  # self.ngt0_matrix(site_dict)
 
     """
     Create a function that calculates the off diagonals
     Take into account transitions and transversions
     return total sum of off diagonals and sum of transitions and transversions
     """
+
     def sum_off_diagonal(self):
         off_diagonals_sum = {}
-        #self.site_dict
+        # self.site_dict
         for site in self.site_dict.keys():
             total = 0
             for k in self.site_dict[site]:
-                if k[0]!=k[1]:
+                if k[0] != k[1]:
                     total += self.site_dict[site][k]
-            if total >0:
+            if total > 0:
                 off_diagonals_sum[site] = total
         print(off_diagonals_sum)
         return off_diagonals_sum
 
-    def site_changes_table(self):
-        print("matrix site changes table function")
-        site_df = pd.DataFrame(columns=['site_and_context', 'total_branch_length', 'change_matrix', 'species'])
-        # print(site_df)
-        #print(self.all_site_dict)
+
+    def site_changes_dictionary_to_df(self, total_branch_length):
+        """
+        Attempting to do this but create a dictionary
+        Key = site_and_context
+            Key = site and context ==> 5_('TCAC', 'TCAC') string
+        Values = total_branch_length, change_nt, branch_context
+            total_branch_length = sum of all branch lengths of site occurrence corresponding to the key
+            proportion_branch_length = what proportion of branches have that context
+            change_nt = a list of all the nt changes ==> [AA, AT, AA, AG] eg
+            branch_context = a list of all the branches with this context ==> [Node1:Oryza, Node1:Node2]
+        """
+        print("matrix site changes dictionary function")
+
+        site_change_dict = {}
+        condense_site_changes = {}
         for key in self.all_site_dict:
-            #print("--")
-            print('KEY:', key)
-            #print(self.all_site_dict[key])
             cur_dict = self.all_site_dict[key]
             # need to now calculate for each site, IF same codon context then add to site matrix?
             for site in cur_dict:
-                #skip if a site doesn't have same codon context
+                # skip if a site doesn't have same codon context --> CHECK THIS...
                 if not cur_dict[site][2]:
                     continue
                 # if the site already has a corresponding codon context that is same then add to that,
                 # if different, then create a new row
-                site_and_context = str(site)+"_"+str(cur_dict[site][0])
-                #print(site_and_context)
-                #print((site_df['site_and_context'] == site_and_context).any())
-                if (site_df['site_and_context'] == site_and_context).any():
-                    #print('same')
-                    pass
-                elif site_and_context not in site_df.site_and_context:
-                    #add row
-                    site_df.loc[len(site_df.index)] = [site_and_context, cur_dict[site][3], cur_dict[site][1],key]
-        print(site_df)
+                cod1 = cur_dict[site][0][0]
+                cod2 = cur_dict[site][0][1]
+                site_and_context = str(site) + "_" + str(cod1) + "_" + str(cod2)
+                # if row already exists then update!
+                b_len = round(cur_dict[site][3], 4)
+                change_nt = [cur_dict[site][1]]
+                if site_and_context in site_change_dict.keys():
+                    # update length --> add together
+                    site_change_dict[site_and_context][0] += round(b_len, 4)
+                    # update branch length proportion to total tree
+                    site_change_dict[site_and_context][1] \
+                        = round(site_change_dict[site_and_context][0]/total_branch_length, 3)
+                    # append the change_nt
+                    site_change_dict[site_and_context][2] += change_nt
+                    # append to list of branches
+                    site_change_dict[site_and_context][3] += [key]
+                else:
+                    # add dictionary element
+                    b_len_prop = round(b_len / total_branch_length, 3)
+                    site_change_dict[site_and_context] = [b_len, b_len_prop, change_nt, [key]]
+
+        df = pd.DataFrame.from_dict(site_change_dict, orient='index')
+        # print(df.sort_index(axis = 0))
+        self.all_change_site_dict = df.sort_index(axis = 0)
+        return df.sort_index(axis = 0)
+
+    def condensed_change_site_dict(self, min_tree_prop=0.6):
+        #print(self.all_change_site_dict)
+        df = self.all_change_site_dict
+        condense_site_changes = {}
+        # check if site and cod1 and cod2 equal each other then add to dictionary
+        # 1130_GT_G: NumChanges, {AA:2,GA:1,GG:3}, {AA:0.103,GA:0.236,GG:0.659}, total proportion, number of flanking GC
+        for i, row in df.iterrows():
+            #print('index: ', i, row)
+            i = i.split("_")
+            site = i[0]
+            cod1 = i[1]
+            cod2 = i[2]
+            #print(site, cod1,cod2)
+            context1 = cod1[0:2] + "_" + cod1[3]
+            context2 = cod2[0:2] + "_" + cod2[3]
+            if context1 == context2:
+                key = str(site) + "_" + context1
+                #print(key)
+                #create new instance of that key in dictionary - intialize
+                if key not in condense_site_changes:
+                    condense_site_changes[key] = [0,{},{},0,0]
+                nuc = row[2][0]
+                #print(nuc)
+                # now update the dictionary
+                # update changes -- if like AT or not same
+                if nuc[0] != nuc[1]:
+                    condense_site_changes[key][0] += len(row[2])
+                    print(nuc, len(row[2]))
+                # update first inside dictionary with count  --> {AA:2,GA:1,GG:3}
+                condense_site_changes[key][1][nuc] = len(row[2])
+                # update second inside dictionary with proportions --> {AA:0.103,GA:0.236,GG:0.659}
+                condense_site_changes[key][2][nuc] = row[1]
+                # update total branch length
+                condense_site_changes[key][3] += row[1]
+                # num of surround G or C
+                # count occurrences of G and C in flank context
+                flanked_bases = context1[1:]
+                print(flanked_bases)
+                counter = flanked_bases.count('G')
+                counter += flanked_bases.count('C')
+                condense_site_changes[key][4] = counter
+        print(condense_site_changes)
+        # remove sites with a minimum proportion --> parameter
+        # go through condense_site_changes and make new dictionary with tree proportions greater than whats specified
+        site_changes_proportion = {}
+        for key in condense_site_changes.keys():
+            if condense_site_changes[key][3] > min_tree_prop:
+                site_changes_proportion[key] = condense_site_changes[key]
+
+        #condensed_df = pd.DataFrame.from_dict(condense_site_changes, orient='index')
+        condensed_df = pd.DataFrame.from_dict(site_changes_proportion, orient='index')
+        condensed_df.to_csv('/Users/shailafye/Documents/Morton-Research/2021-research/condensed-df-169taxa.csv', index=True)
+        return condensed_df
 
