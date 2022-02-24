@@ -2,8 +2,11 @@
 Class
 """
 import numpy as np
+import seaborn as sns
 import pandas as pd
 import itertools
+import matplotlib.pyplot as plt
+from statistics import mean, median, mode, stdev, variance
 
 
 def create_nt_dict():
@@ -24,6 +27,7 @@ class Matrix:
         self.all_site_dict = all_site_dict
         self.site_dict = {}
         self.all_change_site_dict = {}
+        self.final_changes_df = pd.DataFrame
 
     def ngt0_matrix(self, input_dict=None):
         all_matrices = {}
@@ -102,7 +106,6 @@ class Matrix:
         print(off_diagonals_sum)
         return off_diagonals_sum
 
-
     def site_changes_dictionary_to_df(self, total_branch_length):
         """
         Attempting to do this but create a dictionary
@@ -138,7 +141,7 @@ class Matrix:
                     site_change_dict[site_and_context][0] += round(b_len, 4)
                     # update branch length proportion to total tree
                     site_change_dict[site_and_context][1] \
-                        = round(site_change_dict[site_and_context][0]/total_branch_length, 3)
+                        = round(site_change_dict[site_and_context][0] / total_branch_length, 3)
                     # append the change_nt
                     site_change_dict[site_and_context][2] += change_nt
                     # append to list of branches
@@ -150,37 +153,37 @@ class Matrix:
 
         df = pd.DataFrame.from_dict(site_change_dict, orient='index')
         # print(df.sort_index(axis = 0))
-        self.all_change_site_dict = df.sort_index(axis = 0)
-        return df.sort_index(axis = 0)
+        self.all_change_site_dict = df.sort_index(axis=0)
+        return df.sort_index(axis=0)
 
     def condensed_change_site_dict(self, min_tree_prop=0.6):
-        #print(self.all_change_site_dict)
+        # print(self.all_change_site_dict)
         df = self.all_change_site_dict
         condense_site_changes = {}
         # check if site and cod1 and cod2 equal each other then add to dictionary
         # 1130_GT_G: NumChanges, {AA:2,GA:1,GG:3}, {AA:0.103,GA:0.236,GG:0.659}, total proportion, number of flanking GC
         for i, row in df.iterrows():
-            #print('index: ', i, row)
+            # print('index: ', i, row)
             i = i.split("_")
             site = i[0]
             cod1 = i[1]
             cod2 = i[2]
-            #print(site, cod1,cod2)
+            # print(site, cod1,cod2)
             context1 = cod1[0:2] + "_" + cod1[3]
             context2 = cod2[0:2] + "_" + cod2[3]
             if context1 == context2:
                 key = str(site) + "_" + context1
-                #print(key)
-                #create new instance of that key in dictionary - intialize
+                # print(key)
+                # create new instance of that key in dictionary - intialize
                 if key not in condense_site_changes:
-                    condense_site_changes[key] = [0,{},{},0,0]
+                    condense_site_changes[key] = [0, {}, {}, 0, 0]
                 nuc = row[2][0]
-                #print(nuc)
+                # print(nuc)
                 # now update the dictionary
                 # update changes -- if like AT or not same
                 if nuc[0] != nuc[1]:
                     condense_site_changes[key][0] += len(row[2])
-                    print(nuc, len(row[2]))
+                    # print(nuc, len(row[2]))
                 # update first inside dictionary with count  --> {AA:2,GA:1,GG:3}
                 condense_site_changes[key][1][nuc] = len(row[2])
                 # update second inside dictionary with proportions --> {AA:0.103,GA:0.236,GG:0.659}
@@ -190,11 +193,11 @@ class Matrix:
                 # num of surround G or C
                 # count occurrences of G and C in flank context
                 flanked_bases = context1[1:]
-                print(flanked_bases)
+                # print(flanked_bases)
                 counter = flanked_bases.count('G')
                 counter += flanked_bases.count('C')
                 condense_site_changes[key][4] = counter
-        print(condense_site_changes)
+        # print(condense_site_changes)
         # remove sites with a minimum proportion --> parameter
         # go through condense_site_changes and make new dictionary with tree proportions greater than whats specified
         site_changes_proportion = {}
@@ -202,8 +205,80 @@ class Matrix:
             if condense_site_changes[key][3] > min_tree_prop:
                 site_changes_proportion[key] = condense_site_changes[key]
 
-        #condensed_df = pd.DataFrame.from_dict(condense_site_changes, orient='index')
+        # condensed_df = pd.DataFrame.from_dict(condense_site_changes, orient='index')
         condensed_df = pd.DataFrame.from_dict(site_changes_proportion, orient='index')
-        condensed_df.to_csv('/Users/shailafye/Documents/Morton-Research/2021-research/condensed-df-169taxa.csv', index=True)
+        condensed_df.columns = ['total_changes', 'change_type_count', 'change_tree_proportion',
+                                'tree_branch_proportion', 'GC_flanking_count']
+        condensed_df.to_csv('/Users/shailafye/Documents/Morton-Research/2021-research/condensed-df-169taxa.csv',
+                            index=True)
+        self.final_changes_df = condensed_df
         return condensed_df
 
+    def graph_freq_distribution_matplotlib(self):
+        # fix the
+        plt.style.use("seaborn")
+        # Later in the code
+        # self.final_changes_df
+        # use matplotlib to create graphs of frequency distribution of total changes
+        # will need to separate on GC flanking count
+
+        fig, ax = plt.subplots(figsize=(6, 4))
+        self.final_changes_df['weighted_changes'] = self.final_changes_df['total_changes'] / self.final_changes_df[
+            'tree_branch_proportion']
+        changes = self.final_changes_df['weighted_changes']
+        # plt.hist(x, bins=17)
+        # Plot histogram
+        changes.plot(kind="hist", density=True, bins=18)  # change density to true, because KDE uses density
+        # Plot KDE
+        changes.plot(kind="kde")
+        # x.plot(kind="hist", density=False, bins=17)  # change density to true, because KDE uses density
+        # X #
+        ax.set_xlabel("Changes")
+        ax.set_xlim(0)
+        # Y #
+        # Overall #
+        ax.set_title("Frequency Distribution of Changes per Site", size=15, pad=10)
+        ax.grid(False)
+        plt.show()
+        return
+
+    def graph_freq_distribution_seaborn(self):
+        self.final_changes_df['weighted_changes'] = self.final_changes_df['total_changes'] / self.final_changes_df[
+            'tree_branch_proportion']
+
+        def plot_changes(gc=None, df=pd.DataFrame):
+            # df.loc[df['favorite_color'] == 'yellow']
+            gc_context = "All"
+            if gc is not None:
+                print(df.loc[df['GC_flanking_count'] == gc])
+                df = df.loc[df['GC_flanking_count'] == gc]
+                gc_context = str(gc)
+            changes = df['weighted_changes']
+            sns.set_style("white")
+            plt.figure(figsize=(10, 7), dpi=80)
+            p = sns.histplot(changes, color="dodgerblue", label="Compact", kde=True, bins=20)
+            p.set_xlabel("Number of Changes", fontsize=13)
+            p.set_ylabel("Sites", fontsize=13)
+            title_gc = 'Frequency of Changes per Sites ' + gc_context + ' GC Context'
+            p.set_title(label=title_gc, fontsize=19)
+            plt.show()
+            statistical_test(changes)
+
+        # gc content = all
+        plot_changes(gc=None, df=self.final_changes_df)
+        # gc content = 0
+        plot_changes(gc=0, df=self.final_changes_df)
+        # gc content = 1
+        plot_changes(gc=1, df=self.final_changes_df)
+        # gc content = 2
+        plot_changes(gc=2, df=self.final_changes_df)
+
+
+def statistical_test(all_changes=pd.DataFrame):
+    # skew is variance over mean
+    print(all_changes)
+    var = variance(all_changes)
+    print('variance:', var)
+    me = mean(all_changes)
+    print('mean:', me)
+    print('skew:', var / me)

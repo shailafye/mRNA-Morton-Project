@@ -55,9 +55,7 @@ class TreeTracer:
             if len(clade.clades) > 0:
                 for child in clade.clades:
                     if str(child) in self.outgroups:
-                        print('outgroup:', child)
                         continue
-                    #print(child.branch_length)
                     total_length += child.branch_length
         return total_length
 
@@ -72,7 +70,6 @@ class TreeTracer:
                 for child in clade.clades:
                     # skip comparison of outgroup --> go to next for loop iteration line above
                     if str(child) in self.outgroups:
-                        print('outgroup:', child)
                         continue
                     # print('child: ', child.branch_length)
                     # add if statement to check if in dictionary
@@ -177,7 +174,7 @@ class TreeTracer:
                 for child in clade.clades:
                     # skip comparison of outgroup --> go to next for loop iteration line above
                     if str(child) in self.outgroups:
-                        print('outgroup:', child)
+                        #print('outgroup:', child)
                         continue
                     # print('child: ', child.branch_length)
                     # add if statement to check if in dictionary
@@ -203,8 +200,11 @@ class TreeTracer:
         #matrix.site_changes_table()
         # add
         self.change_site_df = matrix.site_changes_dictionary_to_df(round(self.total_branch_length, 4))
-        print(self.change_site_df)
-        print(matrix.condensed_change_site_dict(min_tree_prop=0.6))
+        #print(self.change_site_df)
+        cdf = matrix.condensed_change_site_dict(min_tree_prop=0.6)
+        #print(cdf)
+        #matrix.graph_freq_distribution_matplotlib()
+        matrix.graph_freq_distribution_seaborn()
         return self.change_site_df
 
 
@@ -217,17 +217,10 @@ if __name__ == '__main__':
     seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
     tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
 
-    tree_obj.draw_tree()
-    # tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False) # outgroup=['Pinus', 'Ginkgo']
-    # tree_obj.print_cumulative_matrices()
-    # tree_obj.trace_tree_function(n0_context, branch_length=False)
-    # print(dict_sites)
-    # tree_obj.print_cumulative_matrices()
-    #tree_obj.special_trace_tree_function()
     tree_obj.special_trace_tree_function()
-    #print(tree_obj.total_branch_length)
-    #print(len(tree_obj.site_changes_dict['Node1:Oryza'].keys()))
     tree_obj.get_site_dataframe()
+    #tree_obj.draw_tree(tree_type="normal")
+
 
 
 
