@@ -23,6 +23,11 @@ def create_nt_dict():
 class Matrix:
 
     def __init__(self, cumulative_matrix_dict: dict = {}, all_site_dict: dict = {}):
+        """
+        :param cumulative_matrix_dict:
+        :param all_site_dict: If you are only interested in looking at the site by site analysis
+               ex) 566: [('GTTT', 'GTTT'), 'TT', True, 0.0338], 578: [('CTTC', 'CTTC'), 'TT', True, 0.0338],
+        """
         self.cumulative_matrix_dict = cumulative_matrix_dict
         self.all_site_dict = all_site_dict
         self.site_dict = {}
@@ -31,7 +36,7 @@ class Matrix:
 
     def ngt0_matrix(self, input_dict=None):
         all_matrices = {}
-        print(self.cumulative_matrix_dict)
+        #print(self.cumulative_matrix_dict)
         mat_dict = input_dict or self.cumulative_matrix_dict
         for key in mat_dict:
             arr_zero = np.full((4, 4), 0, dtype=int)
@@ -64,9 +69,13 @@ class Matrix:
     Create a function that makes a matrix for each site
     Input is the dictionary of self.site_changes_dict
         changes dictionary of each site --> key is node2:Zea and value is [(CTCG,CTGG),nuc_change,codon_same=T or F]
+    Output is a dictionary for each site and corresponding matrix --> {5: {'AA': 305, 'AT': 0, ...}...}
     """
 
     def site_matrix(self, specific_site: int = None):
+        """
+        get a cumulative matrix with all the sites across all nodes
+        """
         # print(self.all_site_dict)
         site_dict = {}  # site_dict[5] = {'AA':3, 'TT':5....}
         if specific_site:
@@ -79,12 +88,12 @@ class Matrix:
                     if site not in site_dict.keys():
                         site_dict[site] = create_nt_dict()
                     change_key = self.all_site_dict[key][site][1]
-                    # make sure its true or don't count
+                    # make sure its true or don't count --> same context
                     if self.all_site_dict[key][site][2]:
                         site_dict[site][change_key] += 1
         print(site_dict)
         self.site_dict = site_dict
-        # self.ngt0_matrix(site_dict)
+        self.ngt0_matrix(site_dict)
         return  # self.ngt0_matrix(site_dict)
 
     """
@@ -156,7 +165,7 @@ class Matrix:
         self.all_change_site_dict = df.sort_index(axis=0)
         return df.sort_index(axis=0)
 
-    def condensed_change_site_dict(self, min_tree_prop=0.6):
+    def condensed_change_site_dict(self, min_tree_prop=0.6, to_csv=True):
         # print(self.all_change_site_dict)
         df = self.all_change_site_dict
         condense_site_changes = {}
@@ -209,8 +218,9 @@ class Matrix:
         condensed_df = pd.DataFrame.from_dict(site_changes_proportion, orient='index')
         condensed_df.columns = ['total_changes', 'change_type_count', 'change_tree_proportion',
                                 'tree_branch_proportion', 'GC_flanking_count']
-        condensed_df.to_csv('/Users/shailafye/Documents/Morton-Research/2021-research/condensed-df-169taxa.csv',
-                            index=True)
+        if to_csv:
+            print("final condensed dataframe saved to working directory as final_condensed_df.csv ")
+            condensed_df.to_csv('final_condensed_df.csv', index=True)
         self.final_changes_df = condensed_df
         return condensed_df
 
@@ -242,7 +252,7 @@ class Matrix:
         plt.show()
         return
 
-    def graph_freq_distribution_seaborn(self):
+    def graph_freq_distribution_seaborn(self, show_graphs=False, save_graphs=False, run_stats=False):
         self.final_changes_df['weighted_changes'] = self.final_changes_df['total_changes'] / self.final_changes_df[
             'tree_branch_proportion']
 
@@ -261,8 +271,17 @@ class Matrix:
             p.set_ylabel("Sites", fontsize=13)
             title_gc = 'Frequency of Changes per Sites ' + gc_context + ' GC Context'
             p.set_title(label=title_gc, fontsize=19)
-            plt.show()
-            statistical_test(changes)
+            # save graph
+            if save_graphs:
+                file_name = str(gc_context)+'_gc_distribution_graph.png'
+                plt.savefig(file_name)
+            # show graph to user
+            if show_graphs:
+                plt.show()
+            # run statistical tests
+            if run_stats:
+                statistical_test(changes)
+            return
 
         # gc content = all
         plot_changes(gc=None, df=self.final_changes_df)
@@ -276,9 +295,10 @@ class Matrix:
 
 def statistical_test(all_changes=pd.DataFrame):
     # skew is variance over mean
-    print(all_changes)
+    # print(all_changes)
     var = variance(all_changes)
     print('variance:', var)
     me = mean(all_changes)
     print('mean:', me)
     print('skew:', var / me)
+    # add in chi square goodness of fit test
