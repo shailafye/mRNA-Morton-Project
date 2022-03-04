@@ -38,6 +38,8 @@ class TreeTracer:
         self.site_changes_dict = {}
         # dataframe of all sites and where there are changes
         self.change_site_df = pd.DataFrame
+        # dataframe of sites with same context and corresponding changes/counts
+        self.condensed_final_site_df = pd.DataFrame
         # call the tree_trace function and get all the possible matrix dictionaries and store as instance variables
 
     def cumulative_branch_length(self):
@@ -165,7 +167,7 @@ class TreeTracer:
             return matrix.ngt0_matrix()
         return True
 
-    def special_trace_tree_function(self):
+    def site_trace_tree_function(self):
         # iterate through all nodes and call function on parent node and child
         for clade in self.tree.find_clades():
             # print('Clade:', clade)
@@ -200,7 +202,7 @@ class TreeTracer:
 
         # print out site matrices
         if site_matrices:
-            print(matrix.site_matrix())
+            matrix.site_matrix()
 
         # generate a dataframe of the different sites and context
         # this is an expanded dataframe view and includes ALL branches and contexts
@@ -208,12 +210,12 @@ class TreeTracer:
 
         # need to reduce the dataframe to only sites of interest
         # sites that have the same context and are at minimum a certain percentage of the tree
-        matrix.condensed_change_site_dict(min_tree_prop=0.6, to_csv=to_csv)
+        self.condensed_final_site_df = matrix.condensed_change_site_dict(min_tree_prop=0.6, to_csv=to_csv)
 
         # show frequency distribution graphs of sites with different GC context
         matrix.graph_freq_distribution_seaborn(show_graphs=show_graphs, save_graphs=save_graphs, run_stats=run_stats)
 
-
+        return True
 
 
 if __name__ == '__main__':
@@ -225,42 +227,13 @@ if __name__ == '__main__':
     seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
     tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
 
-    # tree_obj.trace_tree_function(fourfold_n2_context, branch_length=False)
-    # print(tree_obj.cumulative_mat)
-    # tree_obj.print_cumulative_matrices()
+    tree_obj.trace_tree_function(n2_context, branch_length=False)
+    print(tree_obj.cumulative_mat)
+    tree_obj.print_cumulative_matrices()
 
-    tree_obj.special_trace_tree_function()
-    tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=True, run_stats=True)
 
-    #print(tree_obj.change_site_df)
-    #tree_obj.get_site_dataframe()
-    #tree_obj.get_site_matrix()
-    #tree_obj.get_site_dataframe()
+    # tree_obj.site_trace_tree_function()
+    # tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=False)
+    #
+    # print(tree_obj.condensed_final_site_df)
     #tree_obj.draw_tree(tree_type="normal")
-
-
-
-    #
-    # def get_site_matrix(self):
-    #     """
-    #     This function takes the sites and turns into a dictionary like: {5: {'AA': 305, 'AT': 0, ...}}
-    #     This is to create a matrix output
-    #     :return:
-    #     """
-    #     matrix = Matrix(all_site_dict=self.site_changes_dict)
-    #     print(matrix.site_matrix())
-    #     #print("off diagonal")
-    #     #matrix.sum_off_diagonal()
-    #
-    # def get_site_dataframe(self):
-    #     matrix = Matrix(all_site_dict=self.site_changes_dict)
-    #     #matrix.site_changes_table()
-    #     # add
-    #     self.change_site_df = matrix.site_changes_dictionary_to_df(round(self.total_branch_length, 4))
-    #     #print(self.change_site_df)
-    #     cdf = matrix.condensed_change_site_dict(min_tree_prop=0.6)
-    #     #print(cdf)
-    #     #matrix.graph_freq_distribution_matplotlib()
-    #     matrix.graph_freq_distribution_seaborn()
-    #     return self.change_site_df
-
