@@ -1,5 +1,5 @@
 """
-Matrix Class
+MatrixAnalysis Class
 """
 import numpy as np
 import seaborn as sns
@@ -8,6 +8,7 @@ import itertools
 import matplotlib.pyplot as plt
 from statistics import mean, median, mode, stdev, variance
 import math
+from scipy.stats.distributions import chi2
 
 
 def create_nt_dict():
@@ -21,7 +22,7 @@ def create_nt_dict():
     return change_dict
 
 
-class Matrix:
+class MatrixAnalysis:
 
     def __init__(self, cumulative_matrix_dict: dict = {}, all_site_dict: dict = {}):
         """
@@ -37,11 +38,15 @@ class Matrix:
         """
         self.cumulative_matrix_dict = cumulative_matrix_dict
         self.all_site_dict = all_site_dict
+        self.all_matrices = {}
         self.site_dict = {}
         self.all_change_site_df = pd.DataFrame
         self.final_changes_df = pd.DataFrame
 
-    def ngt0_matrix(self, input_dict=None):
+    def ngt0_matrix(self, input_dict=None, save_to_file=False):
+        # add in user specifies which file to save it to
+        if save_to_file:
+            outfile = open('matrix_output.txt', 'w')
         all_matrices = {}
         # print(self.cumulative_matrix_dict)
         mat_dict = input_dict or self.cumulative_matrix_dict
@@ -56,8 +61,15 @@ class Matrix:
                 j = k[1]
                 matrix_arr[conversion[i]][conversion[j]] = float(val)
             print(key, '\n', matrix_arr)
-            all_matrices[key] = matrix_arr
-        return all_matrices
+            self.all_matrices[key] = matrix_arr
+            # write to an outfile
+            if save_to_file:
+                outfile.write('Context: ' + key + '\n')
+                for row in matrix_arr:
+                    outfile.write(' '.join([str(a) for a in row]) + '\n')
+        if save_to_file:
+            outfile.close()
+        return self.all_matrices
 
     def n0_matrix(self):
         arr_zero = np.full((4, 4), 0, dtype=int)
@@ -258,7 +270,7 @@ class Matrix:
                 plt.show()
             # run statistical tests
             if run_stats:
-                statistical_test(changes)
+                statistical_test(changes, gc = gc_context)
             return
 
         # gc content = all
@@ -278,11 +290,18 @@ def calculate_expected(sample_mean: int, freq: int, total_freq: int):
     two = (sample_mean ** freq)
     three = math.factorial(freq)
     four = (one * two)/three
-    print(four)
     return four * total_freq
 
+def get_change_val(interval):
+    # input is interval --> (0, 3] from Changes column
+    # output is average --> 0,1,2 --> 1
+    i = interval.split(",")
+    one = int(i[0][1:])
+    two = int(i[1][0:len(i[1])-1])
+    return int((one+two)/2)
 
-def statistical_test(all_changes=pd.DataFrame):
+def statistical_test(all_changes=pd.DataFrame, gc=''):
+    print("\n\nStatistics Result for GC Context: ", gc)
     # skew is variance over mean
     # print(all_changes)
     var = variance(all_changes)
@@ -292,7 +311,8 @@ def statistical_test(all_changes=pd.DataFrame):
     print('skew:', var / me)
     # chi square goodness of fit test
     # frequency -->
-    bins = [i for i in range(55) if i % 3 == 0]
+    max_changes = int(max(all_changes))
+    bins = [i for i in range(max_changes+5) if i % 3 == 0]
     all_changes_df = pd.DataFrame(all_changes)
     #print(type(pd.DataFrame(all_changes)))
 
@@ -300,20 +320,19 @@ def statistical_test(all_changes=pd.DataFrame):
     frequency_df = frequency_df.sort_index(axis=0)
     frequency_df.reset_index(inplace=True)
 
-    # frequency_df = pd.Series(all_changes.round(0)).value_counts().reset_index().sort_values('index').reset_index(
-    #     drop=True)
     frequency_df.columns = ['Changes', 'Frequency']
-
-    frequency_df['temp_num'] = frequency_df.apply(lambda x: int(str(x['Changes'])[1])+1, axis=1)
+    frequency_df['temp_num'] = frequency_df.apply(lambda x: get_change_val(str(x['Changes'])), axis=1)
 
     frequency_df['multiplied'] = (frequency_df['temp_num']) * frequency_df['Frequency']
     sample_mean = sum(frequency_df['multiplied']) / sum(frequency_df['Frequency'])
-    print('Sample mean', sample_mean)
+    #print('Sample mean', sample_mean)
     expected = calculate_expected(sample_mean, frequency_df['temp_num'][0], sum(frequency_df['Frequency']))
-    print('expected of (0,3]',expected)
+    #print('expected of (0,3]',expected)
+    #print("total frequency column: ", sum(frequency_df['Frequency']))
     frequency_df['expected'] = frequency_df.apply(lambda x: calculate_expected(sample_mean,x['temp_num'], sum(frequency_df['Frequency'])), axis=1)
-    print(frequency_df)
-    # Chi Square
+    #print(frequency_df)
+    # Chi Square --> Goodness of fit test -->
+    # p value is significant = evidence to suggest the data DOES NOT follow a Poisson distribution,
     # ∑(O-E)^2/E
     chi = 0
     for index, row in frequency_df.iterrows():
@@ -321,8 +340,13 @@ def statistical_test(all_changes=pd.DataFrame):
         ex = float(row['expected'])
         chi += ((ob-ex)**2)/ex
 
-    print('chi: ',chi)
+    degrees_free = len(frequency_df)
+    p_val = chi2.sf(chi, degrees_free)
+    print('chi square value: ', chi, ", Degrees of Freedom: ", degrees_free, ", P-value: ", p_val)
+    if p_val < 0.05:
+        print("P value is significant and provides evidence that the data DOES NOT follow the Poisson Distribution")
 
+    return
 
 
 

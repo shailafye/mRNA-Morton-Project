@@ -95,18 +95,3 @@ my_text3 = Text(root, width=50, height=10, font=("Helvetica", 15), bd=2, relief=
 my_text3.pack(pady=10)
 
 root.mainloop()
-
-# label = tk.Label(text="Name")
-# entry = tk.Entry()
-# label.pack()
-# entry.pack()
-#
-# name = entry.get()
-# #
-# # text_box = tk.Text()
-# # text_box.pack()
-# # words = text_box.get("1.0", tk.END)
-#
-# frame1 = tk.Frame(master=root, width=100, height=100, bg="red")
-# frame1.pack(fill = tk.Y)
-#
