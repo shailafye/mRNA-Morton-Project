@@ -218,7 +218,7 @@ class TreeTracer:
         return True
 
     def test_function(self):
-        print("IMPORT TREETRACER WORKED")
+        return "IMPORT TREETRACER WORKED"
 
 
 if __name__ == '__main__':
@@ -230,13 +230,12 @@ if __name__ == '__main__':
     seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
     tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
 
+    tree_obj.trace_tree_function(n2_context, branch_length=False)
+    print(tree_obj.cumulative_mat)
+    tree_obj.print_cumulative_matrices()
 
-    #tree_obj.trace_tree_function(n2_context, branch_length=False)
-    # print(tree_obj.cumulative_mat)
-    #tree_obj.print_cumulative_matrices()
-
-    tree_obj.site_trace_tree_function()
-    tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=True)
+    # tree_obj.site_trace_tree_function()
+    # tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=False)
 
     #print(tree_obj.condensed_final_site_df)
     #tree_obj.draw_tree(tree_type="normal")
