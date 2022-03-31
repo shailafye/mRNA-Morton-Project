@@ -210,32 +210,29 @@ class TreeTracer:
         # need to reduce the dataframe to only sites of interest
         # sites that have the same context and are at minimum a certain percentage of the tree
         self.condensed_final_site_df = matrix.condensed_change_site_dict(min_tree_prop=0.6, to_csv=to_csv)
-
         # show frequency distribution graphs of sites with different GC context
         if show_graphs or save_graphs or run_stats:
             matrix.graph_freq_distribution_seaborn(show_graphs=show_graphs, save_graphs=save_graphs, run_stats=run_stats)
 
         return True
 
-    def test_function(self):
-        return "IMPORT TREETRACER WORKED"
 
 
 if __name__ == '__main__':
-    # newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/iqtree_newick.txt'
-    # seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/grass_rbcl_nodes_seq_fasta.txt'
-    # tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Lilium'])
-    #
-    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
-    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
-    tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
+    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/iqtree_newick.txt'
+    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/grass_rbcl_nodes_seq_fasta.txt'
+    tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Lilium'])
 
-    tree_obj.trace_tree_function(n2_context, branch_length=False)
+    # newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
+    # seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
+    # tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
+
+    tree_obj.trace_tree_function(n1_context, branch_length=False)
     print(tree_obj.cumulative_mat)
     tree_obj.print_cumulative_matrices()
 
     # tree_obj.site_trace_tree_function()
-    # tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=False)
+    # tree_obj.site_change_analysis(to_csv=False, show_graphs=True, save_graphs=False, run_stats=False)
 
-    #print(tree_obj.condensed_final_site_df)
-    #tree_obj.draw_tree(tree_type="normal")
+    # print(tree_obj.condensed_final_site_df)
+    # tree_obj.draw_tree(tree_type="normal")

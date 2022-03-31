@@ -82,7 +82,7 @@ class MatrixAnalysis:
             j = k[1]
             matrix_arr[conversion[i]][conversion[j]] = float(val)
         print(matrix_arr)
-        return matrix_arr
+        return xa
 
     """
     Create a function that makes a matrix for each site
@@ -292,6 +292,7 @@ def calculate_expected(sample_mean: int, freq: int, total_freq: int):
     four = (one * two)/three
     return four * total_freq
 
+
 def get_change_val(interval):
     # input is interval --> (0, 3] from Changes column
     # output is average --> 0,1,2 --> 1
@@ -299,6 +300,7 @@ def get_change_val(interval):
     one = int(i[0][1:])
     two = int(i[1][0:len(i[1])-1])
     return int((one+two)/2)
+
 
 def statistical_test(all_changes=pd.DataFrame, gc=''):
     print("\n\nStatistics Result for GC Context: ", gc)
