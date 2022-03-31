@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QMessageBox, QCheckBox, QPushButton, QFileDialog, QPlainTextEdit
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QMessageBox, QCheckBox, QPushButton, QFileDialog, \
+    QPlainTextEdit, QTextEdit
 from PyQt5 import uic
 import sys
 from treetracer import TreeTracer
@@ -31,15 +32,18 @@ class TreeTracerUI(QMainWindow):
 
         self.save_anno = self.findChild(QLabel, "save_anno")
         self.save_matrices = self.findChild(QCheckBox, "save_matrices")
-        self.print_all_results = self.findChild(QCheckBox, "print_all_results")
         self.save_site_df = self.findChild(QCheckBox,"save_site_df")
         self.save_graphs = self.findChild(QCheckBox,"save_graphs")
+        self.show_graphs = self.findChild(QCheckBox,"show_graphs")
+        self.calc_stats = self.findChild(QCheckBox,"calc_stats")
 
         self.sitebysite_analysis = self.findChild(QCheckBox,"sitebysite_analysis")
 
         self.press_to_run_button = self.findChild(QPushButton, "press_to_run_button")
         self.output_label = self.findChild(QPlainTextEdit, "output_label")
-        self.outgroup_entry = self.findChild(QPlainTextEdit, "output_label")
+        self.outgroup_entry = self.findChild(QPlainTextEdit, "outgroup_entry")
+        self.outgroup_entry.setOverwriteMode(True)
+        self.outgroup_entry.setPlaceholderText("Enter Outgroups:")
         self.push_matrix_info = self.findChild(QPushButton, "push_matrix_info")
         self.push_sitexsite_info = self.findChild(QPushButton, "push_sitexsite_info")
         self.push_saveresults_info = self.findChild(QPushButton, "push_saveresults_info")
@@ -47,9 +51,11 @@ class TreeTracerUI(QMainWindow):
 
         # variables for running TreeTracer
         # newick file you open
-        self.newick_path = ""
+        #self.newick_path = "/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/iqtree_newick.txt"
+        self.newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
         # fasta file you open
-        self.fasta_path = ""
+        #self.fasta_path = "/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/grass_rbcl_nodes_seq_fasta.txt"
+        self.fasta_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
         # ADD IN: if these paths are still "" then take what is in the box,
         # if nothing in box then return error
 
@@ -64,51 +70,62 @@ class TreeTracerUI(QMainWindow):
 
 
         # Execute when press_to_run_button is clicked
+        self.tree_obj = None # object/instance of TreeTracer
         self.press_to_run_button.clicked.connect(self.execute)
 
         # show the app
         self.show()
 
     def execute(self):
-        matrix_output = []
         # check that there is a path to the sequence and newick files
         if len(self.newick_path) > 2 and len(self.fasta_path) > 2:
             if self.outgroup_entry:
-                outgroups_input = self.outgroup_entry.toPlainText()
-                print("OUTGROUPS:", outgroups_input)
-            self.tree_obj = TreeTracer(self.newick_path, self.fasta_path, outgroups=outgroups_input)
+                outgroup_input = self.outgroup_entry.toPlainText()
+                self.outgroup_entry.clear()
+                outgroup_input = [x.strip() for x in outgroup_input.split(',')]
+                print("OUTGROUPS:", outgroup_input)
+            self.tree_obj = TreeTracer(self.newick_path, self.fasta_path, outgroups=outgroup_input)
             if self.n2_fourfold.isChecked():
                 self.tree_obj.trace_tree_function(fourfold_n2_context, branch_length=False)
-                self.tree_obj.print_cumulative_matrices()
+                self.print_save_matrix_results(type='n2 fourfold sites')
+                self.n2_fourfold.setChecked(False)
             if self.n1_fourfold.isChecked():
                 self.tree_obj.trace_tree_function(fourfold_n1_context, branch_length=False)
-                self.tree_obj.print_cumulative_matrices()
+                self.print_save_matrix_results(type='n1 fourfold sites')
+                self.n1_fourfold.setChecked(False)
             if self.n0_fourfold.isChecked():
                 self.tree_obj.trace_tree_function(fourfold_n0_context, branch_length=False)
-                self.tree_obj.print_cumulative_matrices()
+                self.print_save_matrix_results(type='n0 fourfold sites')
+                self.n0_fourfold.setChecked(False)
             if self.n0.isChecked():
                 self.tree_obj.trace_tree_function(n0_context, branch_length=False)
-                self.print_matrix_results()
+                self.print_save_matrix_results(type='n0 sites')
+                self.n0.setChecked(False)
             if self.n1.isChecked():
                 self.tree_obj.trace_tree_function(n1_context, branch_length=False)
-                self.print_matrix_results()
+                self.print_save_matrix_results(type='n1 sites')
+                self.n1.setChecked(False)
             if self.n2.isChecked():
                 self.tree_obj.trace_tree_function(n2_context, branch_length=False)
-                self.tree_obj.print_cumulative_matrices()
+                self.print_save_matrix_results(type='n2 sites')
+                self.n2.setChecked(False)
             if self.sitebysite_analysis.isChecked():
                 self.tree_obj.site_trace_tree_function()
-                self.tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=False)
-        #self.output_label.setPlainText("done")
-        #self.output_label.appendPlainText("added")
-        #self.save_site_df.setChecked(False)
+                self.tree_obj.site_change_analysis(to_csv=self.save_site_df.isChecked(),
+                                                   show_graphs=self.show_graphs.isChecked(),
+                                                   save_graphs=self.save_graphs.isChecked(),
+                                                   run_stats=self.calc_stats.isChecked())
+        self.clear_checked_boxes()
 
-    def print_matrix_results(self):
-        if self.print_all_results.isChecked():
-            for m in self.tree_obj.print_cumulative_matrices():
-                self.output_label.appendPlainText(str(m))
-            self.output_label.appendPlainText("--------\n")
-            #self.output_label.appendPlainText(self.tree_obj.print_cumulative_matrices())
-
+    def print_save_matrix_results(self, type=""):
+        # print option and save to text file option
+        matrices_dict = self.tree_obj.print_cumulative_matrices(save_to_file=self.save_matrices.isChecked())
+        self.output_label.appendPlainText(type)
+        for key in matrices_dict.keys():
+            self.output_label.appendPlainText(str(key))
+            self.output_label.appendPlainText(str(matrices_dict[key]))
+        self.output_label.appendPlainText("--------\n")
+        return True
 
     def open_dialog_box_newick(self):
         # open a dialog box
@@ -152,7 +169,16 @@ class TreeTracerUI(QMainWindow):
             msg.setText("--saveresults--")
             x = msg.exec_()
 
-# Initialize the app
-app = QApplication(sys.argv)
-UIWindow = TreeTracerUI()
-app.exec_()
+    def clear_checked_boxes(self):
+        self.save_matrices.setChecked(False)
+        self.save_site_df.setChecked(False)
+        self.save_graphs.setChecked(False)
+        self.show_graphs.setChecked(False)
+        self.calc_stats.setChecked(False)
+
+
+if __name__ == '__main__':
+    # Initialize the app
+    app = QApplication(sys.argv)
+    UIWindow = TreeTracerUI()
+    app.exec_()

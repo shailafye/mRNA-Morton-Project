@@ -111,6 +111,7 @@ class TreeTracer:
         :param branch_length:
         :return:
         """
+        self.cumulative_mat = {}
         # iterate through all nodes and call function on parent node and child
         self.function_called = function_called
         list_dicts_n0 = []
@@ -156,14 +157,14 @@ class TreeTracer:
                     self.cumulative_mat = dict(functools.reduce(operator.add, map(collections.Counter, list_dicts_n0)))
         return self.cumulative_mat
 
-    def print_cumulative_matrices(self):
+    def print_cumulative_matrices(self,save_to_file=False):
         # create an instance of Matrix class
         matrix = MatrixAnalysis(self.cumulative_mat)
         if self.function_called == n0_context or self.function_called == fourfold_n0_context:
-            return matrix.n0_matrix()
+            return matrix.n0_matrix(save_to_file=save_to_file)
         elif self.function_called == n1_context or self.function_called == n2_context or \
                 self.function_called == fourfold_n1_context or self.function_called == fourfold_n2_context:
-            return matrix.ngt0_matrix()
+            return matrix.ngt0_matrix(save_to_file=save_to_file)
         return True
 
     def site_trace_tree_function(self):
@@ -219,20 +220,26 @@ class TreeTracer:
 
 
 if __name__ == '__main__':
-    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/iqtree_newick.txt'
-    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/grass_rbcl_nodes_seq_fasta.txt'
-    tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Lilium'])
+    # newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/iqtree_newick.txt'
+    # seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/mRNA-Morton-Project/tree-project/grass_rbcl_nodes_seq_fasta.txt'
+    # tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Lilium'])
 
-    # newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
-    # seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
-    # tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
+    # tree_obj.trace_tree_function(n0_context, branch_length=False)
+    # print(tree_obj.cumulative_mat)
+    # print(tree_obj.print_cumulative_matrices(save_to_file=True))
+    # #print(type(tree_obj.print_cumulative_matrices()))
+    #
+    #
+    # tree_obj.trace_tree_function(n1_context, branch_length=False)
+    # print(tree_obj.cumulative_mat)
+    # print(tree_obj.print_cumulative_matrices(save_to_file=False))
+    # #print(type(tree_obj.print_cumulative_matrices()))
 
-    tree_obj.trace_tree_function(n1_context, branch_length=False)
-    print(tree_obj.cumulative_mat)
-    tree_obj.print_cumulative_matrices()
-
-    # tree_obj.site_trace_tree_function()
-    # tree_obj.site_change_analysis(to_csv=False, show_graphs=True, save_graphs=False, run_stats=False)
+    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
+    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
+    tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
+    tree_obj.site_trace_tree_function()
+    tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=False)
 
     # print(tree_obj.condensed_final_site_df)
     # tree_obj.draw_tree(tree_type="normal")

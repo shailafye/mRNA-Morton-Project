@@ -594,7 +594,7 @@
    <widget class="QLabel" name="newickfile_label">
     <property name="geometry">
      <rect>
-      <x>120</x>
+      <x>140</x>
       <y>10</y>
       <width>181</width>
       <height>21</height>
@@ -602,6 +602,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>15</pointsize>
       <bold>true</bold>
      </font>
@@ -613,7 +614,7 @@
    <widget class="QPushButton" name="newick_button">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>180</x>
       <y>30</y>
       <width>100</width>
       <height>32</height>
@@ -621,6 +622,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -631,7 +633,7 @@
    <widget class="QLabel" name="fastafile_label">
     <property name="geometry">
      <rect>
-      <x>660</x>
+      <x>680</x>
       <y>10</y>
       <width>171</width>
       <height>21</height>
@@ -639,6 +641,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>15</pointsize>
       <bold>true</bold>
      </font>
@@ -650,7 +653,7 @@
    <widget class="QPushButton" name="fasta_button">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>710</x>
       <y>30</y>
       <width>100</width>
       <height>32</height>
@@ -658,6 +661,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -668,7 +672,7 @@
    <widget class="QCheckBox" name="n0">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>100</x>
       <y>360</y>
       <width>85</width>
       <height>20</height>
@@ -676,6 +680,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -686,7 +691,7 @@
    <widget class="QLabel" name="analysis_annotation">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>40</x>
       <y>270</y>
       <width>391</width>
       <height>31</height>
@@ -694,6 +699,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>19</pointsize>
       <italic>true</italic>
       <bold>true</bold>
@@ -707,7 +713,7 @@
    <widget class="QCheckBox" name="n1">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>100</x>
       <y>390</y>
       <width>85</width>
       <height>20</height>
@@ -715,6 +721,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -725,7 +732,7 @@
    <widget class="QCheckBox" name="n2">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>100</x>
       <y>420</y>
       <width>85</width>
       <height>20</height>
@@ -733,6 +740,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -743,7 +751,7 @@
    <widget class="QCheckBox" name="n0_fourfold">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>200</x>
       <y>360</y>
       <width>121</width>
       <height>20</height>
@@ -751,6 +759,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -761,7 +770,7 @@
    <widget class="QCheckBox" name="n1_fourfold">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>200</x>
       <y>390</y>
       <width>121</width>
       <height>20</height>
@@ -769,6 +778,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -779,7 +789,7 @@
    <widget class="QCheckBox" name="n2_fourfold">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>200</x>
       <y>420</y>
       <width>121</width>
       <height>20</height>
@@ -787,6 +797,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -797,7 +808,7 @@
    <widget class="QLabel" name="save_anno">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>710</x>
       <y>320</y>
       <width>401</width>
       <height>21</height>
@@ -805,25 +816,27 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>16</pointsize>
       <bold>true</bold>
      </font>
     </property>
     <property name="text">
-     <string>Options to save and view results:</string>
+     <string>Options to save results:</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="save_matrices">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>420</y>
+      <x>710</x>
+      <y>360</y>
       <width>231</width>
       <height>20</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -831,28 +844,10 @@
      <string>Save matrices to txt file</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="print_all_results">
-    <property name="geometry">
-     <rect>
-      <x>690</x>
-      <y>360</y>
-      <width>211</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Print all results on screen</string>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="save_site_df">
     <property name="geometry">
      <rect>
-      <x>690</x>
+      <x>710</x>
       <y>390</y>
       <width>271</width>
       <height>20</height>
@@ -860,6 +855,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -870,25 +866,26 @@
    <widget class="QCheckBox" name="save_graphs">
     <property name="geometry">
      <rect>
-      <x>690</x>
-      <y>450</y>
+      <x>710</x>
+      <y>420</y>
       <width>231</width>
       <height>20</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
     <property name="text">
-     <string>Save frequency distribution graphs</string>
+     <string>Save graphs</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="sitebysite_analysis">
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>420</x>
       <y>360</y>
       <width>171</width>
       <height>20</height>
@@ -896,6 +893,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -906,14 +904,15 @@
    <widget class="QPushButton" name="press_to_run_button">
     <property name="geometry">
      <rect>
-      <x>430</x>
-      <y>520</y>
+      <x>450</x>
+      <y>480</y>
       <width>131</width>
       <height>41</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>15</pointsize>
       <bold>true</bold>
      </font>
@@ -925,7 +924,7 @@
    <widget class="QPlainTextEdit" name="newick_text">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>60</x>
       <y>60</y>
       <width>351</width>
       <height>131</height>
@@ -933,6 +932,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -943,7 +943,7 @@
    <widget class="QPlainTextEdit" name="fasta_text">
     <property name="geometry">
      <rect>
-      <x>580</x>
+      <x>590</x>
       <y>60</y>
       <width>351</width>
       <height>131</height>
@@ -951,6 +951,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -961,14 +962,15 @@
    <widget class="QPlainTextEdit" name="output_label">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>580</y>
+      <x>200</x>
+      <y>550</y>
       <width>631</width>
-      <height>161</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
      </font>
     </property>
@@ -979,14 +981,15 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>560</y>
+      <x>180</x>
+      <y>530</y>
       <width>91</width>
       <height>16</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>16</pointsize>
       <bold>true</bold>
      </font>
@@ -998,7 +1001,7 @@
    <widget class="QLabel" name="outgroup_label">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>90</x>
       <y>220</y>
       <width>261</width>
       <height>21</height>
@@ -1006,6 +1009,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>14</pointsize>
       <bold>true</bold>
      </font>
@@ -1014,28 +1018,10 @@
      <string>List outgroup(s) separated by comma:</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="outgroup_entry">
-    <property name="geometry">
-     <rect>
-      <x>340</x>
-      <y>210</y>
-      <width>351</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>14</pointsize>
-     </font>
-    </property>
-    <property name="plainText">
-     <string>ex) [ougroup1,outgroup2 ]</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>130</x>
       <y>320</y>
       <width>131</width>
       <height>16</height>
@@ -1059,14 +1045,15 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>390</x>
+      <x>380</x>
       <y>320</y>
-      <width>181</width>
+      <width>261</width>
       <height>20</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>18</pointsize>
       <italic>false</italic>
       <bold>true</bold>
@@ -1076,13 +1063,13 @@
      <bool>false</bool>
     </property>
     <property name="text">
-     <string>Site by Site Analysis</string>
+     <string>Genome-Wide Site Analysis</string>
     </property>
    </widget>
    <widget class="QPushButton" name="push_matrix_info">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>260</x>
       <y>310</y>
       <width>16</width>
       <height>21</height>
@@ -1090,6 +1077,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -1108,15 +1096,15 @@
     </property>
     <property name="iconSize">
      <size>
-      <width>6</width>
-      <height>6</height>
+      <width>8</width>
+      <height>8</height>
      </size>
     </property>
    </widget>
    <widget class="QPushButton" name="push_sitexsite_info">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>620</x>
       <y>310</y>
       <width>16</width>
       <height>21</height>
@@ -1124,6 +1112,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -1142,15 +1131,15 @@
     </property>
     <property name="iconSize">
      <size>
-      <width>6</width>
-      <height>6</height>
+      <width>8</width>
+      <height>8</height>
      </size>
     </property>
    </widget>
    <widget class="QPushButton" name="push_saveresults_info">
     <property name="geometry">
      <rect>
-      <x>950</x>
+      <x>900</x>
       <y>310</y>
       <width>16</width>
       <height>21</height>
@@ -1158,6 +1147,7 @@
     </property>
     <property name="font">
      <font>
+      <family>Avenir</family>
       <pointsize>8</pointsize>
      </font>
     </property>
@@ -1177,9 +1167,68 @@
     </property>
     <property name="iconSize">
      <size>
-      <width>6</width>
-      <height>6</height>
+      <width>8</width>
+      <height>8</height>
      </size>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="outgroup_entry">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>210</y>
+      <width>361</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Avenir</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="plainText">
+     <string/>
+    </property>
+    <property name="overwriteMode">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="show_graphs">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>380</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Avenir</family>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Show graphs</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="calc_stats">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>400</y>
+      <width>131</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Calculate Statistics</string>
     </property>
    </widget>
   </widget>

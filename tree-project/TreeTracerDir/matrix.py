@@ -38,7 +38,8 @@ class MatrixAnalysis:
         """
         self.cumulative_matrix_dict = cumulative_matrix_dict
         self.all_site_dict = all_site_dict
-        self.all_matrices = {}
+        self.ngt0_all_matrices = {}
+        self.n0_matrix_result = {}
         self.site_dict = {}
         self.all_change_site_df = pd.DataFrame
         self.final_changes_df = pd.DataFrame
@@ -47,9 +48,10 @@ class MatrixAnalysis:
         # add in user specifies which file to save it to
         if save_to_file:
             outfile = open('matrix_output.txt', 'w')
-        all_matrices = {}
+        #all_matrices = {}
         # print(self.cumulative_matrix_dict)
         mat_dict = input_dict or self.cumulative_matrix_dict
+        print(type(mat_dict))
         for key in mat_dict:
             arr_zero = np.full((4, 4), 0, dtype=int)
             matrix_dict = mat_dict[key]
@@ -61,7 +63,7 @@ class MatrixAnalysis:
                 j = k[1]
                 matrix_arr[conversion[i]][conversion[j]] = float(val)
             print(key, '\n', matrix_arr)
-            self.all_matrices[key] = matrix_arr
+            self.ngt0_all_matrices[key] = matrix_arr
             # write to an outfile
             if save_to_file:
                 outfile.write('Context: ' + key + '\n')
@@ -69,9 +71,11 @@ class MatrixAnalysis:
                     outfile.write(' '.join([str(a) for a in row]) + '\n')
         if save_to_file:
             outfile.close()
-        return self.all_matrices
+        return self.ngt0_all_matrices
 
-    def n0_matrix(self):
+    def n0_matrix(self, save_to_file=True):
+        if save_to_file:
+            outfile = open('n0_matrix_output.txt', 'w')
         arr_zero = np.full((4, 4), 0, dtype=int)
         matrix_dict = self.cumulative_matrix_dict
         matrix_arr = arr_zero
@@ -82,7 +86,13 @@ class MatrixAnalysis:
             j = k[1]
             matrix_arr[conversion[i]][conversion[j]] = float(val)
         print(matrix_arr)
-        return xa
+        if save_to_file:
+            for row in matrix_arr:
+                outfile.write(' '.join([str(a) for a in row]) + '\n')
+        if save_to_file:
+            outfile.close()
+        self.n0_matrix_result['All_n0'] = matrix_arr
+        return self.n0_matrix_result
 
     """
     Create a function that makes a matrix for each site
