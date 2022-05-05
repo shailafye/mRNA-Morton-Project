@@ -109,12 +109,14 @@ class TreeTracerUI(QMainWindow):
                 self.tree_obj.trace_tree_function(n2_context, branch_length=False)
                 self.print_save_matrix_results(type='n2 sites')
                 self.n2.setChecked(False)
-            if self.sitebysite_analysis.isChecked():
+            if self.sitebysite_analysis.isChecked() or self.show_graphs.isChecked() or self.calc_stats.isChecked():
+                self.sitebysite_analysis.setChecked(True)
                 self.tree_obj.site_trace_tree_function()
                 self.tree_obj.site_change_analysis(to_csv=self.save_site_df.isChecked(),
                                                    show_graphs=self.show_graphs.isChecked(),
                                                    save_graphs=self.save_graphs.isChecked(),
                                                    run_stats=self.calc_stats.isChecked())
+                self.sitebysite_analysis.setChecked(False)
         self.clear_checked_boxes()
 
     def print_save_matrix_results(self, type=""):

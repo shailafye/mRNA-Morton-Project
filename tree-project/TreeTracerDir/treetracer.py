@@ -6,7 +6,7 @@ You can apply specific functions/analysis by specifying when creating an instanc
 """
 
 
-from Bio import Phylo
+from Bio import Phylo, SeqIO
 from treetracer_functions import n0_context, n1_context, n2_context, fourfold_n0_context, fourfold_n1_context, \
     fourfold_n2_context, site_changes
 import collections, functools, operator
@@ -26,7 +26,7 @@ class TreeTracer:
         :param outgroups: which outgroups correspond to the newick tree --> list of strings. May only have one
         """
         self.tree = Phylo.read(newick_file, 'newick')
-        self.file_name = sequences_file
+        self.seq_file_name = sequences_file
         self.seq_dict = self.read_seqs()
         self.outgroups = outgroups
         self.final_matrix_dict = {}
@@ -94,16 +94,24 @@ class TreeTracer:
         Value is the sequence
         :return: dictionary of sequences for nodes and species
         """
-        all_sequences = {}
-        infile = open(self.file_name, 'r')
-        lines = infile.readlines()
-        infile.close()
-        for line in range(0, len(lines), 2):
-            gene_name = lines[line].strip()[1:]
-            gene_name = gene_name.strip(' ').split(" ")[0]
-            gene_name = gene_name.split(" ")[0]
-            all_sequences[gene_name] = lines[line + 1].strip()
-        return all_sequences
+        seq_dict = {rec.id: rec.seq for rec in SeqIO.parse(self.seq_file_name, "fasta")}
+        seq_dict_final = {}
+        for key in seq_dict:
+            seq_temp = str(seq_dict[key])
+            seq_dict_final[key] = seq_temp
+        return seq_dict_final
+        #
+        # all_sequences = {}
+        # infile = open(self.seq_file_name, 'r')
+        # lines = infile.readlines()
+        # infile.close()
+        # for line in range(0, len(lines), 2):
+        #     gene_name = lines[line].strip()[1:]
+        #     gene_name = gene_name.strip(' ').split(" ")[0]
+        #     gene_name = gene_name.split(" ")[0]
+        #     #all_sequences[gene_name] = lines[line + 1].strip()
+        #     all_sequences[gene_name] = lines[line + 1].strip()
+        # return all_sequences
 
     def trace_tree_function(self, function_called: Callable, branch_length=True):
         """
@@ -181,10 +189,9 @@ class TreeTracer:
                     # add if statement to check if in dictionary of sequences
                     if str(clade) in self.seq_dict and str(child) in self.seq_dict:
                         # print('pair:',clade, ' and ',child)
-                        # print(type(clade.name))
                         seq1 = self.seq_dict[clade.name]
                         seq2 = self.seq_dict[child.name]
-                        key = str(clade.name + ', ' + child.name)
+                        # key = str(clade.name + ', ' + child.name)
                         # call the function and return that dictionary
                         rd = site_changes(seq1, seq2, child.branch_length, self.third_codon_sites)
                         self.site_changes_dict[str(clade.name+':'+child.name)] = rd
@@ -198,6 +205,7 @@ class TreeTracer:
         :return:
         """
         # create a matrix object with the self.site_changes_dict
+        print("self.site_changes_dict:", self.site_changes_dict)
         matrix = MatrixAnalysis(all_site_dict=self.site_changes_dict)
 
         # print out site matrices
@@ -207,10 +215,11 @@ class TreeTracer:
         # generate a dataframe of the different sites and context
         # this is an expanded dataframe view and includes ALL branches and contexts
         self.change_site_df = matrix.site_changes_dictionary_to_df(round(self.total_branch_length, 4))
-
+        print(self.change_site_df.sort_index())
         # need to reduce the dataframe to only sites of interest
         # sites that have the same context and are at minimum a certain percentage of the tree
         self.condensed_final_site_df = matrix.condensed_change_site_dict(min_tree_prop=0.6, to_csv=to_csv)
+        print(self.condensed_final_site_df)
         # show frequency distribution graphs of sites with different GC context
         if show_graphs or save_graphs or run_stats:
             matrix.graph_freq_distribution_seaborn(show_graphs=show_graphs, save_graphs=save_graphs, run_stats=run_stats)
@@ -235,11 +244,15 @@ if __name__ == '__main__':
     # print(tree_obj.print_cumulative_matrices(save_to_file=False))
     # #print(type(tree_obj.print_cumulative_matrices()))
 
-    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
-    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
+    #newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcl_seqs_Newick.txt'
+    #seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/all_rbcL_seqs.txt'
+
+    newick_path = '/Users/shailafye/Documents/Morton-Research/2021-research/data/atpA/atpA_Newick.txt'
+    seq_path = '/Users/shailafye/Documents/Morton-Research/2021-research/data/atpA/all_ancestralseqs.fasta'
     tree_obj = TreeTracer(newick_path, seq_path, outgroups=['Pinus', 'Ginkgo', 'Zamia', 'Welwitschi'])
+
     tree_obj.site_trace_tree_function()
-    tree_obj.site_change_analysis(to_csv=False, show_graphs=False, save_graphs=False, run_stats=False)
+    tree_obj.site_change_analysis(to_csv=True, show_graphs=True, save_graphs=False, run_stats=False)
 
     # print(tree_obj.condensed_final_site_df)
     # tree_obj.draw_tree(tree_type="normal")
